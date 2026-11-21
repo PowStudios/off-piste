@@ -152,7 +152,8 @@ body.touch .speedo b{font-size:24px}
 .evRow b{display:block;height:100%;background:#fff;transform-origin:left center;transition:transform .25s linear}
 .evRow em{font:800 15px/1 var(--display);font-style:normal;text-align:right;color:#fff}
 .evRow.low{border-left-color:#ff4d4d}
-.evRow.low b{background:#ff4d4d}
+#ev_o2{background:#3fa9ff}
+#ev_wm{background:#ff8a1f}
 .evRow.crit{animation:evBlink .5s steps(2,end) infinite}
 @keyframes evBlink{50%{background:rgba(120,0,0,.85)}}
 body.ev .gamechat{bottom:calc(140px + env(safe-area-inset-bottom,0px))}
@@ -1067,23 +1068,50 @@ const LEVELS={
 let LEVEL='back'; try{ const l=localStorage.getItem('off-piste-level'); if(LEVELS[l]) LEVEL=l; }catch(e){}
 /* Everest: summit plateau, then a ~52 degree face (steeper than The Wall) with rolls and rock bands, easing out onto base camp */
 const EV_LEN=3200, EV_N=EV_LEN+900;
-const EVF=[ {k:'crev',d:480,w:7,lip:1.5}, {k:'cliff',d:640,h:20}, {k:'cliff',d:960,h:28}, {k:'crev',d:1240,w:8,lip:1.7}, {k:'cliff',d:1560,h:34},
-            {k:'gap',d:1820,w:20,lip:5.5,name:'The Icefall'}, {k:'crev',d:2280,w:9,lip:1.9}, {k:'cliff',d:2420,h:26}, {k:'crev',d:2960,w:7,lip:1.5} ];
+const EVF=[ {k:'crev',d:420,w:7,ox:13,og:5}, {k:'cliff',d:640,h:20}, {k:'crev',d:720,w:8,ox:-11,og:5}, {k:'cliff',d:960,h:28}, {k:'crev',d:1300,w:8,ox:11,og:4.5},
+            {k:'cliff',d:1560,h:34}, {k:'crev',d:1810,w:9,ox:-10,og:4.5,name:'The Icefall'}, {k:'crev',d:1880,w:9,ox:10,og:4.5}, {k:'crev',d:1950,w:9,ox:-8,og:4.5},
+            {k:'crev',d:2210,w:9,ox:12,og:4.5}, {k:'cliff',d:2420,h:26}, {k:'crev',d:2870,w:8,ox:13,og:4.5}, {k:'crev',d:2950,w:7,ox:-10,og:5} ];
 // rock bands: a wall of rock across the whole face with one narrow couloir through it (gx: couloir offset from the fall line)
 const EVB=[ {d:810,w:11,gap:13,gx:12}, {d:1420,w:12,gap:12,gx:-15}, {d:2090,w:12,gap:12,gx:7}, {d:2780,w:13,gap:11,gx:-11} ];
 // glacier shelves: flatter blue ice with serac towers (some collapse) and melt pools
 const EVS=[ {d0:1060,d1:1180,n:7,pools:4}, {d0:1675,d1:1772,n:5,pools:3}, {d0:2560,d1:2690,n:8,pools:5} ];
+const EVRT=(()=>{ const pts=[];
+  for(const f of EVF) if(f.k!=='cliff') pts.push([f.d-10,f.ox],[f.d+f.w+10,f.ox]);
+  for(const b of EVB) pts.push([b.d-b.w-4,b.gx],[b.d+b.w+4,b.gx]);
+  pts.sort((a,b)=>a[0]-b[0]); const cp=[[0,0]];
+  for(const q of pts){ const p=cp[cp.length-1]; if(q[0]-p[0]>170) cp.push([p[0]+60,0],[q[0]-60,0]); cp.push(q); }
+  cp.push([cp[cp.length-1][0]+60,0],[EV_N+2,0]);
+  const t=new Float32Array(EV_N+2); let k=0;
+  for(let d=0;d<EV_N+2;d++){ while(k<cp.length-2 && cp[k+1][0]<=d) k++; const a=cp[k], b=cp[k+1], u=clamp((d-a[0])/Math.max(1e-6,b[0]-a[0]),0,1);
+    t[d]=a[1]+(b[1]-a[1])*u*u*(3-2*u); }
+  return t; })();
+function evC(z){ return 24*Math.sin(z*0.009) + 9*Math.sin(z*0.021+1.3) + 3*Math.sin(z*0.043+0.4); }
+function evRoute(d){ if(d<=0) return 0; if(d>=EV_N) return 0; const i=Math.floor(d), u=d-i; return EVRT[i]+(EVRT[i+1]-EVRT[i])*u; }
 const EVP=(()=>{ let sd=88491; const r=()=>(sd=(sd*16807)%2147483647)/2147483647; const ser=[], pools=[];
   for(const sh of EVS){ let tries=0, n=0;
     while(n<sh.n && tries++<400){ const d=sh.d0+10+r()*(sh.d1-sh.d0-22), off=(r()*2-1)*20, w=4.5+r()*5, dd=4+r()*4, h=10+r()*12, rad=Math.max(w,dd)*0.55;
-      if(ser.some(o=>Math.hypot(o.off-off,o.d-d)<o.rad+rad+11)) continue;
-      ser.push({d,off,w,dd,h,rad,rot:(r()-0.5)*0.9,seed:r()*10,ladder:r()<0.35,unstable:r()<0.45}); n++; }
+      if(ser.some(o=>Math.hypot(o.off-off,o.d-d)<o.rad+rad+11) || Math.abs(off-evRoute(d))<rad+9) continue;
+      ser.push({d,off,w,dd,h,rad,rot:(r()-0.5)*0.9,seed:r()*10}); n++; }
     tries=0; n=0;
     while(n<sh.pools && tries++<400){ const d=sh.d0+8+r()*(sh.d1-sh.d0-16), off=(r()*2-1)*19, a=2.5+r()*4, b=2+r()*2.5;
-      if(ser.some(o=>Math.hypot(o.off-off,o.d-d)<o.rad+a+4) || pools.some(o=>Math.hypot(o.off-off,o.d-d)<o.a+a+5)) continue;
+      if(ser.some(o=>Math.hypot(o.off-off,o.d-d)<o.rad+a+4) || pools.some(o=>Math.hypot(o.off-off,o.d-d)<o.a+a+5) || Math.abs(off-evRoute(d))<a+5) continue;
       pools.push({d,off,a,b}); n++; } }
-  return {ser,pools}; })();
-const EV_GATES=[...EVF.map(f=>f.d-(f.k==='gap'?230:95)), ...EVB.map(b=>b.d-90), ...EVS.map(s2=>s2.d0-60)];
+  for(const [d0,d1,m] of [[1826,1866,3],[1896,1936,3],[1966,2010,3],[440,470,2],[1320,1360,2],[2230,2270,2]]){ let tries=0, n=0;
+    while(n<m && tries++<300){ const d=d0+r()*(d1-d0), off=(r()*2-1)*20, w=4+r()*4, dd=3.5+r()*3, h=9+r()*10, rad=Math.max(w,dd)*0.55;
+      if(ser.some(o=>Math.hypot(o.off-off,o.d-d)<o.rad+rad+7) || Math.abs(off-evRoute(d))<rad+9) continue;
+      ser.push({d,off,w,dd,h,rad,rot:(r()-0.5)*0.9,seed:r()*10}); n++; } }
+  const thin=[]; { let tries=0; while(thin.length<34 && tries++<2000){ const d=200+r()*(EV_LEN-560), rr=2.2+r()*1.6, side=r()<0.5?-1:1, off=evRoute(d)+side*(rr+5+r()*11);
+      if(EVF.some(f=>d>f.d-14 && d<f.d+(f.w||0)+14) || EVB.some(b=>Math.abs(d-b.d)<b.w+8) || thin.some(o=>Math.abs(o.d-d)<16)) continue;
+      if(ser.some(o=>Math.hypot(o.off-off,o.d-d)<o.rad+rr+3) || pools.some(o=>Math.hypot(o.off-off,o.d-d)<o.a+rr+3)) continue;
+      { const R0=evRoute(d), E=evEdge(-d); if(off<Math.min(0,R0)-E+rr+3 || off>Math.max(0,R0)+E-rr-3) continue; }
+      { let bad=false; for(let a=0;a<6&&!bad;a++){ const x=evC(-d)+off+Math.cos(a)*rr, z=-d+Math.sin(a)*rr; if(evNz(x,z)>0.72) bad=true; } if(bad) continue; }
+      thin.push({d,off,r:rr}); } thin.sort((a,b)=>a.d-b.d); }
+  return {ser,pools,thin}; })();
+const EV_GATES=[...EVF.map(f=>f.d-(f.k==='cliff'?60:45)), ...EVB.map(b=>b.d-50), ...EVS.map(s2=>s2.d0-30)].sort((a,b)=>a-b);
+function evThin(x,z){ const d=-z; for(const t of EVP.thin){ if(Math.abs(d-t.d)>t.r) continue; const dx=x-center(-t.d)-t.off, dz=d-t.d, q=(dx*dx+dz*dz)/(t.r*t.r); if(q<1) return {t,q}; } return null; }
+function evThinH(x,z){ const h=evThin(x,z); return h ? -0.6*(1-h.q) : 0; }
+// how far outside the snow channel (between the rock ribs) this point is; the channel always contains the guided line
+function evSide(x,z){ const c=center(z), dx=x-c, r=evRoute(-z); return Math.max(dx-Math.max(0,r), Math.min(0,r)-dx)-evEdge(z); }
 function evNz(x,z){ return Math.sin(x*0.071+z*0.023)*Math.sin(z*0.053-x*0.041+1.7)+0.55*Math.sin(x*0.17+z*0.11+0.4)*Math.sin(z*0.13-x*0.09+2.1); }
 function evSafe(d){ if(d<160 || d>EV_LEN-330) return true; for(const f of EVF) if(d>f.d-(f.k==='cliff'?30:45) && d<f.d+(f.w||0)+40) return true;
   for(const g of EV_GATES) if(d>g-8 && d<g+30) return true; for(const s2 of EVS) if(d>s2.d0-35 && d<s2.d1+10) return true; for(const b of EVB) if(Math.abs(d-b.d)<35) return true; return false; }
@@ -1091,8 +1119,8 @@ function evSafe(d){ if(d<160 || d>EV_LEN-330) return true; for(const f of EVF) i
 function evRock(x,z){ const d=-z; if(d<40) return 0; const c=center(z), dx=x-c; let k=0;
   for(const b of EVB){ const e=Math.abs(d-b.d); if(e<b.w){ const edge=b.w*0.5+1.6*Math.sin(x*0.31+b.d)*Math.sin(x*0.13); if(e<edge){
       const cg=Math.abs(dx-b.gx)-b.gap*0.5; k=Math.max(k,clamp(cg/1.5,0,1)); } } }
-  if(!evSafe(d)){ const n=evNz(x,z); k=Math.max(k,clamp((n-0.8)/0.16,0,1)); }
-  const side=Math.abs(dx)-evEdge(z); if(side>0) k=Math.max(k,clamp(side/3,0,1)*clamp((evNz(x*1.7,z*1.3)+1.25)/0.35,0,1));
+  if(!evSafe(d)){ const n=evNz(x,z); k=Math.max(k,clamp((n-0.8)/0.16,0,1)*clamp((Math.abs(dx-evRoute(d))-9)/4,0,1)); }
+  const side=evSide(x,z); if(side>0) k=Math.max(k,clamp(side/3,0,1)*clamp((evNz(x*1.7,z*1.3)+1.25)/0.35,0,1));
   return k; }
 // half-width of the snow couloir between the rock ribs
 function evEdge(z){ const d=-z; if(d<60) return 60; return 21+5*Math.sin(d*0.011+1)+4*Math.sin(d*0.037)+Math.max(0,(d-(EV_LEN-330))*0.2); }
@@ -1108,34 +1136,31 @@ const evT=(()=>{ const sl=new Float32Array(EV_N); for(let d=0;d<EV_N;d++){ let v
     else if(d<EV_LEN-280) v=1.3+0.14*Math.sin(d*0.021)+0.08*Math.sin(d*0.057+1.7);
     else if(d<EV_LEN-110) v=1.3-(1.3-0.06)*((d-(EV_LEN-280))/170); else v=0.06;
     for(const s2 of EVS) if(d>=s2.d0 && d<s2.d1) v=0.22;
-    for(const f of EVF){ if(f.k==='cliff'){ if(d>=f.d && d<f.d+30) v=0.62; continue; } const a=f.d-(f.k==='gap'?40:75), b=f.d+f.w+(f.k==='gap'?45:25);
-      if(d>=a && d<f.d) v=f.k==='gap'?0.75:0.5; else if(d>=f.d && d<b) v=f.k==='gap'?0.85:0.9; }
+    for(const f of EVF){ if(f.k==='cliff'){ if(d>=f.d && d<f.d+30) v=0.62; continue; } }
+    if(d>=1785 && d<1990) v=Math.min(v,0.6);
     sl[d]=v; }
   const sm=new Float32Array(EV_N); for(let i=0;i<EV_N;i++){ let a=0,n=0; for(let j=-8;j<=8;j++){ const k=i+j; if(k>=0&&k<EV_N){ a+=sl[k]; n++; } } sm[i]=a/n; }
   const cum=new Float32Array(EV_N+1); for(let i=0;i<EV_N;i++) cum[i+1]=cum[i]+sm[i]; return cum; })();
 function evDrop(d){ if(d<=0) return d*0.22; if(d>=EV_N) return evT[EV_N]+(d-EV_N)*0.06; const i=Math.floor(d), t=d-i; return evT[i]+(evT[i+1]-evT[i])*t; }
 // extra shape on top of the smooth face: lips, slots and cliff steps. Returns the change in height at distance d down the hill.
-function evFeatH(d){ let h=0;
+function evFeatH(d,x){ let h=0;
   for(const f of EVF){
     if(f.k==='cliff'){ if(d>f.d) h-=f.h*Math.min(1,(d-f.d)/1.4); continue; }
-    const L=f.k==='gap'?14:9;
-    if(d>f.d-L && d<=f.d){ const t=(d-(f.d-L))/L; h+=f.lip*t*t; }                       // the lip curls up to the edge
-    if(d>f.d && d<f.d+f.w){ const e=Math.min(d-f.d,f.d+f.w-d); h-=Math.min(1,e/0.7)*30; }  // the slot: 30 m deep, near-vertical walls
-    if(d>=f.d+f.w && d<f.d+f.w+4) h-=0.6*(1-(d-f.d-f.w)/4);
-    if(f.k==='gap' && d>=f.d+f.w) h-=7;   // the far side of the Icefall sits well below the lip                                // far edge sits a touch lower
+    if(d>f.d && d<f.d+f.w){ const bx=Math.abs(x-center(-d)-f.ox)-f.og, e=Math.min(d-f.d,f.d+f.w-d,bx); if(e>0) h-=Math.min(1,e/0.7)*30; }  // the slot: 30 m deep, near-vertical walls, one snow bridge across
   }
   return h; }
-function evColor(x,z,ny,i){ const d=-z, o=i*3;
+function evColor(x,z,ny,i,A){ const d=-z, o=i*3; A=A||tCol;
   let rk=Math.max(evRock(x,z), clamp((0.5-ny)/0.18,0,1)); const ic=evIce(x,z)*(1-rk);
   let r=1,g=1,b=1;
   if(ic>0){ const v=0.9+0.1*Math.sin(x*0.7+z*0.5); r=1-ic*(1-0.62*v); g=1-ic*(1-0.84*v); b=1-ic*(1-1.0*v); }
   if(rk>0){ const v=0.75+0.25*Math.sin(x*1.3+z*0.7)*Math.sin(z*1.9-x*0.4), rc=0.13*v, snowy=clamp((ny-0.66)/0.2,0,0.2);
     const tr=rc+(1-rc)*snowy, tg=rc*0.96+(1-rc*0.96)*snowy, tb=rc*0.93+(1-rc*0.93)*snowy; r=r+(tr-r)*rk; g=g+(tg-g)*rk; b=b+(tb-b)*rk; }
-  for(const f of EVF) if(f.k!=='cliff' && d>f.d-0.5 && d<f.d+f.w+0.5){ r=0.42; g=0.66; b=0.88; }
-  tCol[o]=r; tCol[o+1]=g; tCol[o+2]=b; }
-function evInSlot(d){ for(const f of EVF) if(f.k!=='cliff' && d>f.d+0.3 && d<f.d+f.w-0.3) return f; return null; }
+  for(const f of EVF) if(f.k!=='cliff' && d>f.d-0.5 && d<f.d+f.w+0.5 && Math.abs(x-center(-d)-f.ox)>f.og-0.6){ r=0.42; g=0.66; b=0.88; }
+  const th=evThin(x,z); if(th){ const k=1-th.q*0.55, cr=Math.abs(Math.sin(x*3.1+z*2.3)*Math.sin(z*2.7-x*1.9))>0.78?1:0; r*=1-k*0.5-cr*0.25; g*=1-k*0.36-cr*0.2; b*=1-k*0.16-cr*0.1; }
+  A[o]=r; A[o+1]=g; A[o+2]=b; }
+function evInSlot(d,x){ for(const f of EVF) if(f.k!=='cliff' && d>f.d+0.3 && d<f.d+f.w-0.3 && Math.abs(x-center(-d)-f.ox)>f.og+0.3) return f; return null; }
 function center(z){
-  if(LEVEL==='everest') return 0.8*(22*Math.sin(z*0.0045) + 9*Math.sin(z*0.013+1.3));
+  if(LEVEL==='everest') return evC(z);
   if(LEVEL==='pipe'||LEVEL==='mega') return 0;
   const a = LEVEL==='park' ? 0.5 : 1;
   return a*(22*Math.sin(z*0.0055) + 9*Math.sin(z*0.016+1.3)); }
@@ -1157,7 +1182,7 @@ function baseH(x,z){
   if(LEVEL==='pipe') return z*0.36 + pipeWall(Math.abs(x)) + 0.12*Math.sin(z*0.05);
   if(LEVEL==='everest'){ const c=center(z);
     // broad ridges and gullies running down the face, plus wind-blown rolls
-    const rk=evRock(x,z), rib=Math.abs(x-c)-evEdge(z); return -evDrop(-z) + evFeatH(-z) + rk*(2.0+1.3*evCrag(x,z)) + (rib>0?Math.min(9,rib*0.5)*(0.75+0.3*evCrag(x*0.6,z*0.6)):0) + evPoolDip(x,z) + 2.6*Math.sin((x-c)*0.045+z*0.006) + 1.3*Math.sin((x-c)*0.11-z*0.019) + 0.55*(1.1*Math.sin(x*0.09+z*0.045) + 0.7*Math.sin(z*0.12-x*0.06) + 0.32*Math.sin(x*0.21+z*0.17)); }
+    const rk=evRock(x,z), rib=evSide(x,z); return -evDrop(-z) + evFeatH(-z,x) + evThinH(x,z) + rk*(2.0+1.3*evCrag(x,z)) + (rib>0?Math.min(9,rib*0.5)*(0.75+0.3*evCrag(x*0.6,z*0.6)):0) + evPoolDip(x,z) + 2.6*Math.sin((x-c)*0.045+z*0.006) + 1.3*Math.sin((x-c)*0.11-z*0.019) + 0.55*(1.1*Math.sin(x*0.09+z*0.045) + 0.7*Math.sin(z*0.12-x*0.06) + 0.32*Math.sin(x*0.21+z*0.17)); }
   const bump = LEVEL==='park'||LEVEL==='mega' ? 0.22 : LEVEL==='steep' ? 0.35 : 1;
   let h = (LEVEL==='mega' ? -megaDrop(-z) : LEVEL==='steep' ? z*STEEP : slopeH(z)) + bump*(1.1*Math.sin(x*0.09+z*0.045) + 0.7*Math.sin(z*0.12-x*0.06) + 0.32*Math.sin(x*0.21+z*0.17));
   const e = Math.abs(x-center(z)) - (LEVEL==='park'||LEVEL==='mega' ? 26 : 20); if(e>0) h += e*e*0.05;
@@ -1218,6 +1243,7 @@ let tOX=NaN, tOZ=NaN;
 /* The grid is (SX+1) x (SZ+1), vertex i = iz*(SX+1)+ix. When it slides, rows/columns already computed are reused,
    so a shift only samples groundH on the new strip. Normals come straight from the height grid. */
 const TNX=SX+1, TNZ=SZ+1, tH=new Float32Array(TNX*TNZ), tH2=new Float32Array(TNX*TNZ);
+const tC=new Float32Array(TNX*TNZ*3), tC2=new Float32Array(TNX*TNZ*3), tFresh=new Uint8Array(TNX*TNZ); let tCLev='';
 const tIX=new Int16Array(tPos.count), tIZ=new Int16Array(tPos.count);
 for(let i=0;i<tPos.count;i++){ tIX[i]=Math.round((tBase[i*2]+TW/2)/cellX); tIZ[i]=Math.round((tBase[i*2+1]+TL/2)/cellZ); }
 function updateTerrain(force){
@@ -1226,11 +1252,18 @@ function updateTerrain(force){
   if(!force && ox===tOX && oz===tOZ) return;
   const dX=Math.round((ox-tOX)/cellX), dZ=Math.round((oz-tOZ)/cellZ), reuse=!force && isFinite(dX) && isFinite(dZ);
   tOX=ox; tOZ=oz; terrain.position.set(ox,0,oz);
-  const x0=ox-TW/2, z0=oz-TL/2;
+  const x0=ox-TW/2, z0=oz-TL/2, ev=LEVEL==='everest', cOK=ev && tCLev===LEVEL+WORLD_SEED; tCLev=ev?LEVEL+WORLD_SEED:'';
   for(let iz=0;iz<TNZ;iz++){ const jz=iz+dZ, rowOK=reuse && jz>=0 && jz<TNZ, wz=z0+iz*cellZ;
-    for(let ix=0;ix<TNX;ix++){ const jx=ix+dX;
-      tH2[iz*TNX+ix] = (rowOK && jx>=0 && jx<TNX) ? tH[jz*TNX+jx] : groundH(x0+ix*cellX, wz); } }
+    for(let ix=0;ix<TNX;ix++){ const jx=ix+dX, g=iz*TNX+ix;
+      if(rowOK && jx>=0 && jx<TNX){ const h=jz*TNX+jx; tH2[g]=tH[h]; if(cOK){ tC2[g*3]=tC[h*3]; tC2[g*3+1]=tC[h*3+1]; tC2[g*3+2]=tC[h*3+2]; tFresh[g]=0; } else tFresh[g]=1; }
+      else { tH2[g]=groundH(x0+ix*cellX, wz); tFresh[g]=1; } } }
   tH.set(tH2);
+  if(ev){ const a=1/(2*cellX), b=1/(2*cellZ);
+    for(let iz=0;iz<TNZ;iz++) for(let ix=0;ix<TNX;ix++){ const g=iz*TNX+ix; if(!tFresh[g]) continue;
+      const hl=tH[ix>0?g-1:g], hr=tH[ix<TNX-1?g+1:g], hd=tH[iz>0?g-TNX:g], hu=tH[iz<TNZ-1?g+TNX:g];
+      const nx=(hr-hl)*(ix>0&&ix<TNX-1?a:2*a), nz=(hu-hd)*(iz>0&&iz<TNZ-1?b:2*b);
+      evColor(x0+ix*cellX, z0+iz*cellZ, 1/Math.sqrt(nx*nx+1+nz*nz), g, tC2); }
+    tC.set(tC2); }
   const arr = tPos.array, uv = tUV.array, nrm = tGeo.attributes.normal.array, US=6, uo=Math.floor(ox/US), vo=Math.floor(oz/US);
   const ix2=1/(2*cellX), iz2=1/(2*cellZ);
   for(let i=0;i<tPos.count;i++){ const ix=tIX[i], iz=tIZ[i], g=iz*TNX+ix;
@@ -1238,8 +1271,8 @@ function updateTerrain(force){
     const hl=tH[ix>0?g-1:g], hr=tH[ix<TNX-1?g+1:g], hd=tH[iz>0?g-TNX:g], hu=tH[iz<TNZ-1?g+TNX:g];
     const nx=-(hr-hl)*(ix>0&&ix<TNX-1?ix2:2*ix2), nz=-(hu-hd)*(iz>0&&iz<TNZ-1?iz2:2*iz2), il=1/Math.sqrt(nx*nx+1+nz*nz);
     nrm[i*3]=nx*il; nrm[i*3+1]=il; nrm[i*3+2]=nz*il;
-    if(LEVEL==='everest') evColor(x0+ix*cellX, z0+iz*cellZ, il, i); }
-  if(LEVEL==='everest'){ tColEv=true; tGeo.attributes.color.needsUpdate=true; } else if(tColEv){ tCol.fill(1); tColEv=false; tGeo.attributes.color.needsUpdate=true; }
+    if(ev){ tCol[i*3]=tC[g*3]; tCol[i*3+1]=tC[g*3+1]; tCol[i*3+2]=tC[g*3+2]; } }
+  if(ev){ tColEv=true; tGeo.attributes.color.needsUpdate=true; } else if(tColEv){ tCol.fill(1); tColEv=false; tGeo.attributes.color.needsUpdate=true; }
   tPos.needsUpdate = true; tUV.needsUpdate = true; tGeo.attributes.normal.needsUpdate = true;
 }
 
@@ -1460,10 +1493,10 @@ function genChunk(z0,z1){
     while(nextFeatureZ > z1-80 && !pastEnd(nextFeatureZ) && !(GENMOD.boss!=null && nextFeatureZ<GENMOD.boss+70)){ const r=WR();
       if(LEVEL==='park'){ if(r<0.33) spawnKicker(nextFeatureZ); else spawnRail(nextFeatureZ, r>0.66); nextFeatureZ -= GENMOD.feat*wrand(34,52); }
       else if(LEVEL==='glades'){ spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(150,210); }
-      else if(LEVEL==='everest'){ if(r<0.45 && !EVF.some(f=>Math.abs(-nextFeatureZ-f.d)<70)) spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(230,330); }
+      else if(LEVEL==='everest'){ nextFeatureZ -= GENMOD.feat*wrand(230,330); }
       else if(LEVEL==='steep'){ spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(55,85); }
       else { if(r<0.45) spawnRail(nextFeatureZ); else spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(70,115); } }
-    while(nextGateZ > z1 && !pastEnd(nextGateZ)){ spawnGate(nextGateZ); nextGateZ -= 160; }
+    while(LEVEL!=='everest' && nextGateZ > z1 && !pastEnd(nextGateZ)){ spawnGate(nextGateZ); nextGateZ -= 160; }
   }
   const nP = LEVEL==='park'||LEVEL==='mega'||LEVEL==='pipe'||LEVEL==='everest' ? 0 : LEVEL==='glades' ? 1+Math.floor(WR()*3) : WR()<0.75 ? (WR()<0.45?2:1) : 0;
   for(let i=0;i<nP;i++){
@@ -2800,12 +2833,12 @@ function updateEnvironment(){
   skyU.uCloud.value=clamp(PAL.cloud+(WEATHER==='blizzard'?0.7:WEATHER==='fog'?0.3:WEATHER==='clear'?-0.2:0),0,1);
   renderer.toneMappingExposure=PAL.exposure;
   { const hb=clamp(0.45+lr(PAL.hemiI)*0.6,0.72,1); palColor('hSky',t,tmpSprayC); pUni.uColor.value.setRGB(1,1,1).lerp(tmpSprayC,0.3).multiplyScalar(hb); }
-  const W=WEATHERS[WEATHER]; scene.fog.density+=(W.fog-scene.fog.density)*0.08;
+  const W=WEATHERS[WEATHER]; scene.fog.density+=((LEVEL==='everest'?Math.max(W.fog,0.0125):W.fog)-scene.fog.density)*0.08;
   lamp.intensity=lr(PAL.lamp)*1.4; lamp.position.set(P.x,P.y+2.2,P.z+1.2);
   const lightDir=tmpV.set(sunDir.x,Math.max(0.16,elev+0.1),sunDir.z).normalize();
   sunLight.position.set(P.x+lightDir.x*110,P.y+lightDir.y*110,P.z+lightDir.z*110); sunLight.target.position.set(P.x,P.y,P.z-12);
   pUni.uColor.value.setRGB(1,0.96,1).lerp(skyU.uSun.value,0.18);
-  sky.position.copy(camera.position); mtn.position.set(camera.position.x,camera.position.y-30,camera.position.z);
+  sky.position.copy(camera.position); { const ev=LEVEL==='everest'; mtn.scale.y=ev?0.22:1; mtn.position.set(camera.position.x,camera.position.y-(ev?95:30),camera.position.z); }
   pUni.uScale.value=renderer.getContext().drawingBufferHeight/(2*Math.tan(camera.fov*Math.PI/360));
   modeEnv(); realEnv();
 }
@@ -3519,43 +3552,63 @@ Object.assign(EVM,{
   iceDeep:new THREE.MeshStandardMaterial({color:L(0x6fbde8),roughness:0.15,metalness:0.05,emissive:L(0x06304a),emissiveIntensity:0.4,flatShading:true}),
   water:new THREE.MeshStandardMaterial({color:L(0x2bbdd2),roughness:0.04,metalness:0.25,emissive:L(0x07343c),emissiveIntensity:0.35,transparent:true,opacity:0.8,depthWrite:false}),
   ladder:new THREE.MeshStandardMaterial({color:L(0xb9bec6),roughness:0.4,metalness:0.8})});
-// a serac: a chunky leaning tower of glacier ice, faceted, with the odd aluminium ladder up its uphill face
-function evSeracGeo(w,h,dd,seed){ const g=new THREE.BoxGeometry(w,h,dd,3,6,3), p=g.attributes.position;
-  for(let i=0;i<p.count;i++){ const x=p.getX(i), y=p.getY(i), z=p.getZ(i), t=(y+h/2)/h;
-    const n=Math.sin(x*1.7+seed)*Math.sin(y*0.8+seed*2.1)+0.6*Math.sin(z*1.9+y*0.5+seed*3.3), taper=1-0.28*t;
-    p.setXYZ(i, x*taper*(1+0.12*n), y+(t>0.98?Math.sin(x*2.3+z*1.7+seed)*h*0.08:0), z*taper*(1+0.12*Math.sin(x*1.1-y+seed))); }
-  g.translate(0,h/2,0); g.computeVertexNormals(); return g; }
-function evSerac(o){ const z=-o.d, x=center(z)+o.off, y=Math.min(groundH(x-o.w/2,z),groundH(x+o.w/2,z),groundH(x,z-o.dd/2),groundH(x,z+o.dd/2))-0.6;
-  const g=new THREE.Group(); const m=new THREE.Mesh(evSeracGeo(o.w,o.h,o.dd,o.seed),o.seed>5?EVM.iceDeep:EVM.ice); m.castShadow=true; m.receiveShadow=true; g.add(m);
-  if(o.ladder){ const lh=o.h*0.85, lz=o.dd/2*0.78+0.15, lg=new THREE.Group();
-    for(const sx of [-0.25,0.25]){ const rl=new THREE.Mesh(new THREE.BoxGeometry(0.05,lh,0.05),EVM.ladder); rl.position.set(sx,lh/2,0); lg.add(rl); }
-    for(let k=0.3;k<lh;k+=0.32){ const rg=new THREE.Mesh(new THREE.CylinderGeometry(0.018,0.018,0.5,5),EVM.ladder); rg.rotation.z=Math.PI/2; rg.position.set(0,k,0); lg.add(rg); }
-    lg.position.set(o.w*0.12,0.3,lz); lg.rotation.x=-0.12; g.add(lg); }
+// a serac: a cluster of jagged, leaning ice prisms. Deep blue at the base fading to pale, banded with layers, crusted with snow on top.
+const EVSM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:0.45,metalness:0.02,flatShading:true,envMapIntensity:0.45});
+function evPrism(rb,h,seed){ const sides=4+Math.floor((seed*7.3)%3), g0=new THREE.CylinderGeometry(rb*0.8,rb,h,sides,6,false), p=g0.attributes.position;
+  const lean=0.12*Math.sin(seed*3.1);
+  for(let i=0;i<p.count;i++){ const x=p.getX(i), y=p.getY(i), z=p.getZ(i), t=(y+h/2)/h, a=Math.atan2(z,x);
+    const n=1+0.22*Math.sin(a*3+seed*2.3+t*4.1)+0.14*Math.sin(t*17+seed+a*5)+0.08*Math.sin(a*11-t*9+seed*4.7);
+    let yy=y; if(t>0.99) yy+=h*(0.16*Math.cos(a-seed*2.2)+0.05*Math.sin(a*5+seed));   // a broken, slanted top
+    p.setXYZ(i, x*n+lean*y, yy, z*n+0.5*lean*y); }
+  const g=g0.toNonIndexed(); g0.dispose(); g.translate(0,h/2,0); g.computeVertexNormals();
+  const P2=g.attributes.position, N=g.attributes.normal, col=new Float32Array(P2.count*3);
+  for(let i=0;i<P2.count;i+=3){ const ny=(N.getY(i)+N.getY(i+1)+N.getY(i+2))/3, ym=(P2.getY(i)+P2.getY(i+1)+P2.getY(i+2))/3, t=ym/h;
+    let r=0.01+0.17*t, gg=0.12+0.36*t, b=0.4+0.42*t;
+    const band=0.5+0.5*Math.sin(ym*1.6+seed*3+0.4*Math.sin(ym*0.37)); if(band>0.82){ r*=0.78; gg*=0.88; b*=0.96; }
+    if(Math.sin(ym*4.7+seed)>0.93){ r=Math.min(1,r+0.25); gg=Math.min(1,gg+0.18); }
+    if(ny>0.5 || (t>0.94 && ny>0.1)){ r=0.9; gg=0.93; b=0.97; }
+    for(let k=0;k<3;k++){ col[(i+k)*3]=r; col[(i+k)*3+1]=gg; col[(i+k)*3+2]=b; } }
+  g.setAttribute('color',new THREE.BufferAttribute(col,3)); return g; }
+function evSerac(o){ const z=-o.d, x=center(z)+o.off, y=Math.min(groundH(x-o.w/2,z),groundH(x+o.w/2,z),groundH(x,z-o.dd/2),groundH(x,z+o.dd/2))-0.8;
+  const g=new THREE.Group(); let sd=o.seed;
+  const main=new THREE.Mesh(evPrism(Math.max(o.w,o.dd)*0.55,o.h,sd),EVSM); g.add(main);
+  const n=1+Math.floor((o.seed*13.7)%3);
+  for(let k=0;k<n;k++){ sd+=1.618; const a=sd*2.4, rr=Math.max(o.w,o.dd)*(0.34+0.1*Math.sin(sd*5)), hh=o.h*(0.4+0.35*Math.abs(Math.sin(sd*3.3)));
+    const m=new THREE.Mesh(evPrism(rr,hh,sd),EVSM); m.position.set(Math.cos(a)*o.w*0.42,0,Math.sin(a)*o.dd*0.42); m.rotation.y=sd; g.add(m); }
+  g.traverse(m=>{ if(m.isMesh){ m.castShadow=true; m.receiveShadow=true; } });
   g.position.set(x,y,z); g.rotation.y=o.rot; scene.add(g);
-  const ob={type:'serac',x,z,y,r:(o.w+o.dd)*0.24,h:o.h,mesh:g,src:o,st:o.unstable?0:-1,t:0};
+  const ob={type:'serac',x,z,y,r:Math.max(o.w,o.dd)*0.55,h:o.h,mesh:g,src:o};
   objs.push(ob); EV.seracs.push(ob); }
-// some seracs let go as you come down: a crack and a shake, then the tower topples across the line and leaves a field of ice blocks
-function evSeracTick(dt){ if(!EV.seracs) return;
-  for(const s2 of EV.seracs){ if(s2.st<0 || !s2.mesh) continue; const ahead=P.z-s2.z;
-    if(s2.st===0){ if(ahead>18 && ahead<48 && Math.abs(P.x-s2.x)<34){ s2.st=1; s2.t=0;
-        const dx=P.x-s2.x; s2.dir=new THREE.Vector3(Math.abs(dx)<3?(Math.random()<0.5?-1:1):Math.sign(dx),0,-0.9).normalize();
-        s2.axis=new THREE.Vector3(s2.dir.z,0,-s2.dir.x); s2.q0=s2.mesh.quaternion.clone(); showTrick('Serac collapse','get out of the way'); try{ sfxCrash(); }catch(e){} } continue; }
-    if(s2.st===1){ s2.t+=dt; const sh=Math.max(0,0.7-s2.t)*0.12; s2.mesh.position.x=s2.x+Math.sin(s2.t*60)*sh;
-      if(s2.t<0.7){ if(Math.random()<0.5) emit(s2.x+rand(-2,2),s2.y+rand(1,s2.h),s2.z+rand(-2,2),rand(-1,1),rand(-1,0.5),rand(-1,1),rand(0.15,0.35),rand(0.8,1.4),[0.85,0.95,1]); continue; }
-      const t=Math.min(1,(s2.t-0.7)/1.3), th=1.45*t*t;
-      s2.mesh.quaternion.copy(s2.q0).premultiply(new THREE.Quaternion().setFromAxisAngle(s2.axis,th)); s2.mesh.position.x=s2.x;
-      // anything in the fall zone gets flattened once the tower is past halfway down
-      if(th>0.6 && P.crash<=0){ const px=P.x-s2.x, pz=P.z-s2.z, along=px*s2.dir.x+pz*s2.dir.z, lat=Math.abs(px*s2.dir.z-pz*s2.dir.x);
-        if(along>0 && along<s2.h*Math.sin(th)+1 && lat<s2.src.w*0.5+0.6 && P.y-physH(P.x,P.z)<3){ P.vx*=0.1; P.vz*=0.1; crash('Crushed by a serac'); } }
-      if(t>=1){ s2.st=2; s2.r=0; s2.h=0;
-        for(let k=1.5;k<s2.h;k+=2.4){ const bx=s2.x+s2.dir.x*k, bz=s2.z+s2.dir.z*k; objs.push({type:'serac',x:bx,z:bz,y:groundH(bx,bz),r:1.1,h:3});
-          for(let i=0;i<14;i++) emit(bx+rand(-1.5,1.5),groundH(bx,bz)+rand(0.2,2),bz+rand(-1.5,1.5),rand(-4,4),rand(1,6),rand(-4,4),rand(0.4,1.1),rand(0.8,1.6),[0.88,0.96,1]); } } } } }
+// red guide lights down the line, alternating sides; they glow through the fog
+let evLightTex=null;
+function evLights(){ const step=13, n=Math.floor((EV_LEN-60)/step), poleG=new THREE.CylinderGeometry(0.05,0.06,1.6,6), lampG=new THREE.SphereGeometry(0.16,10,8);
+  poleG.translate(0,0.8,0);
+  const poles=new THREE.InstancedMesh(poleG,EVM.post,n), lamps=new THREE.InstancedMesh(lampG,new THREE.MeshBasicMaterial({color:0xff2a1a,toneMapped:false,fog:false}),n);
+  if(!evLightTex){ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'), gr=x.createRadialGradient(32,32,0,32,32,32);
+    gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(0.25,'rgba(255,255,255,0.55)'); gr.addColorStop(1,'rgba(255,255,255,0)'); x.fillStyle=gr; x.fillRect(0,0,64,64); evLightTex=new THREE.CanvasTexture(c); }
+  const hp=new Float32Array(n*3), m4=new THREE.Matrix4(), g=new THREE.Group(); EV.lights=[];
+  for(let i=0;i<n;i++){ const d=50+i*step, z=-d, side=i%2?1:-1, x=center(z)+evRoute(d)+side*3.6, y=groundH(x,z);
+    m4.makeTranslation(x,y,z); poles.setMatrixAt(i,m4); m4.makeTranslation(x,y+1.65,z); lamps.setMatrixAt(i,m4); hp[i*3]=x; hp[i*3+1]=y+1.65; hp[i*3+2]=z; EV.lights.push({x,z}); }
+  const hg=new THREE.BufferGeometry(); hg.setAttribute('position',new THREE.BufferAttribute(hp,3));
+  const halo=new THREE.Points(hg,new THREE.PointsMaterial({color:0xff2414,map:evLightTex,size:1.5,sizeAttenuation:true,transparent:true,opacity:0.6,depthWrite:false,fog:false,toneMapped:false}));
+  [poles,lamps,halo].forEach(m=>{ m.frustumCulled=false; g.add(m); }); poles.castShadow=true; halo.renderOrder=3;
+  scene.add(g); objs.push({type:'deco',x:0,z:-EV_LEN-600,mesh:g}); }
+// thin snow bridges: step on one and it gives way into the slot underneath
+const EVHM=new THREE.MeshBasicMaterial({color:0x061522,fog:true});
+function evThinTick(dt){ if(!EV.thin) return; const onG=!P.air && P.y-physH(P.x,P.z)<0.5;
+  const h=evThin(P.x,P.z);
+  for(const t of EV.thin){ if(t.st===2){ if(h&&h.t===t.src && P.crash<=0 && onG && h.q<0.7){ P.vx=P.vz=0; P.vy=0; crash('Fell into a hidden crevasse'); } continue; }
+    if(h && h.t===t.src && onG){ t.on=(t.on||0)+dt; if(t.on>0.12 && P.crash<=0){ t.st=2;
+        const x=center(-t.src.d)+t.src.off, z=-t.src.d, y=groundH(x,z), m=new THREE.Mesh(new THREE.CircleGeometry(t.src.r*0.9,18),EVHM); m.geometry.rotateX(-Math.PI/2); m.position.set(x,y+0.06,z); scene.add(m); objs.push({type:'deco',x,z,mesh:m});
+        for(let i=0;i<60;i++) emit(x+rand(-t.src.r,t.src.r),y+rand(0,0.8),z+rand(-t.src.r,t.src.r),rand(-3,3),rand(-1,5),rand(-3,3),rand(0.3,0.9),rand(0.8,1.6),[0.92,0.96,1]);
+        try{ sfxCrash(); }catch(e){} P.vx*=0.1; P.vz*=0.1; P.vy=-4; crash('Snow bridge collapsed'); } }
+    else t.on=0; } }
 function evPool(p){ const z=-p.d, x=center(z)+p.off, geo=new THREE.CircleGeometry(1,28), pa=geo.attributes.position;
   geo.rotateX(-Math.PI/2);
   for(let i=0;i<pa.count;i++){ const u=pa.getX(i), v=pa.getZ(i), wx=x+u*p.a*0.97, wz=z+v*p.b*0.97; const q=u*u+v*v; pa.setXYZ(i,wx-x,groundH(wx,wz)-groundH(x,z)+0.3*clamp((0.85-q)/0.2,0,1)+0.03,wz-z); }
   geo.computeVertexNormals(); const m=new THREE.Mesh(geo,EVM.water); m.position.set(x,groundH(x,z),z); m.receiveShadow=true; m.renderOrder=2; scene.add(m);
   objs.push({type:'pool',x,z,mesh:m}); }
-function evSlotWater(f){ const z=-(f.d+f.w/2), x=center(z), geo=new THREE.PlaneGeometry(120,f.w+1); geo.rotateX(-Math.PI/2);
+function evSlotWater(f){ const z=-(f.d+f.w/2), x=center(z), geo=new THREE.PlaneGeometry(140,f.w+1); geo.rotateX(-Math.PI/2);
   const m=new THREE.Mesh(geo,EVM.water); m.position.set(x,groundH(x,z)+4,z); scene.add(m); objs.push({type:'pool',x,z,mesh:m}); }
 function evAlt(){ return Math.round(EV_TOP-clamp(-P.z/EV_LEN,0,1)*(EV_TOP-EV_BASE)); }
 function evBottle(x,z){ const g=new THREE.Group(), y=groundH(x,z);
@@ -3569,18 +3622,14 @@ function evCamp(x,z,n){ const g=new THREE.Group(), y=groundH(x,z);
   g.position.set(x,y,z); scene.add(g); const o={type:'camp',x,z,mesh:g,got:false,n}; objs.push(o); EV.items.push(o);
   clears.push({x,w:9,top:z+8,bot:z-8}); }
 function evWorld(){ EV.items=[];
-  for(const g of EV_GATES) spawnGate(-g);
-  for(const b of EVB){ const z=-(b.d-12), c=center(z)+b.gx; for(const sx of [-1,1]){ const x=c+sx*(b.gap*0.5-1.5), y=groundH(x,z), g=new THREE.Group();
-      for(let i=0;i<5;i++){ const m=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,1.4,6),i%2?EVM.post:EVM.bottle); m.position.y=0.7+i*1.4; g.add(m); }
-      const fl=new THREE.Mesh(new THREE.PlaneGeometry(1.3,0.8),EVM.tent); fl.position.set(sx*0.7,6.5,0); g.add(fl);
-      g.position.set(x,y,z); scene.add(g); objs.push({type:'pole',x,z,mesh:g}); } }
+  evLights(); EV.thin=EVP.thin.map(t=>({src:t,st:0,on:0})); EV.cp=0;
   EV.seracs=[]; for(const o of EVP.ser) evSerac(o); for(const p of EVP.pools) evPool(p);
   for(const f of EVF) if(f.k!=='cliff') evSlotWater(f);
-  for(let z=-150, i=0; z>-EV_LEN+120; z-=250, i++){ if(EVF.some(f=>-z>f.d-30 && -z<f.d+(f.w||0)+30)||EVB.some(b=>Math.abs(-z-b.d)<25)) z-=60; let x=center(z)+(i%2?1:-1)*wrand(5,12); for(let k=0;k<8&&evRock(x,z)>0.2;k++) x=center(z)+wrand(-20,20); clears.push({x,w:3,top:z+6,bot:z-6}); evBottle(x,z); }
-  for(let z=-650, n=1; z>-EV_LEN+200; z-=700, n++){ let x=center(z)+16; for(let k=0;k<10&&evRock(x,z)>0.1;k++) x=center(z)+wrand(-26,26); evCamp(x,z,n); }
+  for(let z=-150, i=0; z>-EV_LEN+120; z-=250, i++){ if(EVF.some(f=>-z>f.d-30 && -z<f.d+(f.w||0)+30)||EVB.some(b=>Math.abs(-z-b.d)<25)) z-=60; let x=center(z)+evRoute(-z)+(i%2?1:-1)*wrand(0.5,2.5); for(let k=0;k<8&&(evRock(x,z)>0.2||evThin(x,z));k++) x=center(z)+evRoute(-z)+wrand(-3,3); clears.push({x,w:3,top:z+6,bot:z-6}); evBottle(x,z); }
+  for(let z=-650, n=1; z>-EV_LEN+200; z-=700, n++){ let x=center(z)+evRoute(-z)+13; for(let k=0;k<10&&(evRock(x,z)>0.1||evThin(x,z));k++) x=center(z)+evRoute(-z)+(k%2?-1:1)*wrand(11,18); evCamp(x,z,n); }
 }
 function evPre(){ COURSE_END=-EV_LEN;
-  if(!SKY_HOLD){ SKY_HOLD={l:LIGHT,w:WEATHER}; if(LIGHT!=='night') LIGHT='day'; WEATHER='clear'; syncSky(); } }
+  if(!SKY_HOLD){ SKY_HOLD={l:LIGHT,w:WEATHER}; if(LIGHT!=='night') LIGHT='day'; WEATHER='snow'; syncSky(); } }
 function evPost(){ document.body.classList.add('ev'); $('evBars').hidden=false; EV.warned=0; EV.warnB=0; EV.warnS=0; Object.assign(EV,{o2:100,warm:100,dead:0,why:'',t:0,wind:0,lowAlt:EV_TOP,camps:0,bottles:0});
   showTrick('Summit '+fmt(EV_TOP)+' m','get to base camp alive'); }
 function evDie(why){ if(EV.dead>0) return; EV.dead=2; EV.why=why; showTrick('Passed out',why,true); P.vx*=0.3; P.vz*=0.3; }
@@ -3591,7 +3640,7 @@ function evTick(dt,hold){
   if(hold || FIN.done){ if(hy) hy.style.opacity='0'; return false; }
   EV.t+=dt; const sp=Math.hypot(P.vx,P.vz), hi=clamp(-P.z/EV_LEN,0,1), alt=1-hi;
   EV.lowAlt=Math.min(EV.lowAlt,evAlt());
-  EV.o2-=(0.22+0.2*alt+(P.tuck>0.5?0.08:0))*dt;
+  EV.o2-=(0.1+0.08*alt+(P.tuck>0.5?0.03:0))*dt;
   EV.warm-=(0.13+sp*0.006+(P.air?0.15:0))*dt;
   // gusts push you across the hill, harder up high
   const gust=Math.sin(EV.t*0.37)*Math.sin(EV.t*0.91+1.3); EV.wind=gust*(1.2+2.4*alt);
@@ -3601,16 +3650,17 @@ function evTick(dt,hold){
   for(const o of EV.items){ if(o.got || !o.mesh) continue;
     if(o.type==='o2'){ o.mesh.children[1].rotation.y+=dt*2; if(Math.abs(P.z-o.z)<2.2 && Math.abs(P.x-o.x)<2.2){ o.got=true; o.mesh.visible=false; EV.o2=Math.min(100,EV.o2+32); EV.bottles++; sfxBank(); showTrick('Oxygen','+28%'); } }
     else if(o.type==='camp' && P.z<o.z){ o.got=true; EV.camps++; EV.warm=Math.min(100,EV.warm+40); EV.o2=Math.min(100,EV.o2+8); showTrick('Camp '+o.n,'warmed up +40'); } }
-  { const f=evInSlot(-P.z); if(f && P.crash<=0 && P.y < Math.min(physH(P.x,-(f.d)),physH(P.x,-(f.d+f.w+0.5)))-5){ P.vx=P.vz=0; P.vy=0; crash(f.k==='gap'?'Fell into the Icefall':'Fell into a crevasse'); } }
+  { const f=evInSlot(-P.z,P.x); if(f && P.crash<=0 && P.y < Math.min(physH(P.x,-(f.d)),physH(P.x,-(f.d+f.w+0.5)))-5){ P.vx=P.vz=0; P.vy=0; crash(f.name?'Fell into the Icefall':'Fell into a crevasse'); } }
+  for(const g of EV_GATES) if(-P.z>g && EV.cp<g && P.crash<=0 && !P.air){ EV.cp=g; CP.z=-g; CP.x=center(-g)+evRoute(g); }
+  evThinTick(dt);
   if(P.crash<=0 && !P.air && P.y-physH(P.x,P.z)<0.4){
     if(evRock(P.x,P.z)>0.55){ P.vx*=0.2; P.vz*=0.2; crash('Hit the rocks'); }
     else if(evInPool(P.x,P.z)){ for(let i=0;i<40;i++) emit(P.x+rand(-1,1),P.y+0.2,P.z+rand(-1,1),rand(-3,3),rand(2,6),rand(-3,3),rand(0.3,0.7),rand(0.6,1.1),[0.45,0.85,0.95]); P.vx*=0.1; P.vz*=0.1; crash('Fell into a melt pool'); } }
-  evSeracTick(dt);
-  for(const b of EVB){ const ahead=b.d-(-P.z); if(ahead<150 && ahead>130 && EV.warnB!==b.d){ EV.warnB=b.d; showTrick('Rock band','find the couloir'); } }
-  for(const s2 of EVS){ const ahead=s2.d0-(-P.z); if(ahead<120 && ahead>100 && EV.warnS!==s2.d0){ EV.warnS=s2.d0; showTrick('Glacier','seracs, melt pools, sheet ice'); } }
+  for(const b of EVB){ const ahead=b.d-(-P.z); if(ahead<150 && ahead>130 && EV.warnB!==b.d){ EV.warnB=b.d; showTrick('Rock band','the lights go through the couloir'); } }
+  for(const s2 of EVS){ const ahead=s2.d0-(-P.z); if(ahead<120 && ahead>100 && EV.warnS!==s2.d0){ EV.warnS=s2.d0; showTrick('Glacier','seracs, melt pools, thin snow'); } }
   // heads-up before each one
   for(const f of EVF){ const d=-P.z, ahead=f.d-d; if(ahead<170 && ahead>150 && EV.warned!==f.d){ EV.warned=f.d;
-      showTrick(f.k==='gap'?f.name:f.k==='crev'?'Crevasse ahead':'Cliff ahead', f.k==='cliff'?'big drop, land it':f.k==='gap'?'huge gap: full speed, hit the lip':'carry speed and jump it'); } }
+      showTrick(f.name||(f.k==='crev'?'Crevasse ahead':'Cliff ahead'), f.k==='cliff'?'big drop, land it':f.name?'crevasse maze: stay on the lights':'follow the lights over the snow bridge'); } }
   if(EV.o2<=0){ EV.o2=0; evDie('ran out of oxygen'); }
   else if(EV.warm<=0){ EV.warm=0; evDie('too cold'); }
   if(hy){ const k=Math.max(clamp((35-EV.o2)/35,0,1),clamp((30-EV.warm)/30,0,1)*0.8); hy.style.opacity=(k*0.85).toFixed(3); hy.classList.toggle('cold',EV.warm<EV.o2); }
@@ -3999,10 +4049,12 @@ const PANO_GLSL=`uniform float uYaw;
 const VERT_DIR='varying vec3 vD; void main(){ vD=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }';
 
 /* ---- sky: the panorama on a sphere that follows the camera ---- */
-const panoMat=new THREE.ShaderMaterial({uniforms:{uTex:{value:null},uYaw:{value:REAL.yaw},uGain:{value:1}},
+const panoMat=new THREE.ShaderMaterial({uniforms:{uTex:{value:null},uYaw:{value:REAL.yaw},uGain:{value:1},uDrop:{value:0},uHaze:{value:0},uFogC:{value:new THREE.Color(1,1,1)}},
   vertexShader:VERT_DIR,
-  fragmentShader:PANO_GLSL+`uniform sampler2D uTex; uniform float uGain; varying vec3 vD;
-    void main(){ gl_FragColor=vec4(texture2D(uTex,panoUV(normalize(vD))).rgb*uGain,1.0); }`,
+  fragmentShader:PANO_GLSL+`uniform sampler2D uTex; uniform float uGain; uniform float uDrop; uniform float uHaze; uniform vec3 uFogC; varying vec3 vD;
+    void main(){ vec3 d=normalize(vD); d=normalize(vec3(d.x,d.y+uDrop,d.z));
+      vec3 c=texture2D(uTex,panoUV(d)).rgb*uGain; float h=uHaze*(1.0-0.45*clamp(d.y*2.0,0.0,1.0));
+      gl_FragColor=vec4(mix(c,uFogC,h),1.0); }`,
   side:THREE.BackSide, depthWrite:false, fog:false, toneMapped:false});
 const pano=new THREE.Mesh(new THREE.SphereGeometry(900,96,48),panoMat); pano.renderOrder=-3; pano.visible=false; scene.add(pano);
 
@@ -4253,6 +4305,8 @@ function realEnv(){
     const i=((Math.floor(((u%1)+1)%1*256))%256)*3; REAL.fog.lerp(tmpSprayC.setRGB(REAL.hor[i],REAL.hor[i+1],REAL.hor[i+2]),0.2); }
   scene.fog.color.copy(REAL.fog);
   const W=WEATHERS[WEATHER]; scene.fog.density=WEATHER==='clear'?M.fog*0.85:WEATHER==='snow'?M.fog*1.3:Math.max(W.fog,M.fog);
+  { const ev=LEVEL==='everest'; if(ev) scene.fog.density=Math.max(scene.fog.density,0.0125);
+    panoMat.uniforms.uDrop.value=ev?0.16:0; panoMat.uniforms.uHaze.value=ev?0.55:0; panoMat.uniforms.uFogC.value.copy(scene.fog.color); }
   panoMat.uniforms.uGain.value=WEATHER==='blizzard'?0.75:WEATHER==='fog'?0.85:1;
   pUni.uColor.value.setRGB(M.sunCol[0],M.sunCol[1],M.sunCol[2]).lerp(tmpSprayC.setRGB(0.9,0.93,0.98),0.6).multiplyScalar(LIGHT==='night'?0.78:1);
   if(!IMP.mesh && REAL.ready && RT_.tree) realTrees();
