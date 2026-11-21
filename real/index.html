@@ -144,6 +144,22 @@ body.touch .speedo b{font-size:24px}
 .trick.bad .trick-name{background:none;color:var(--bad)}
 .tag.sketch{background:var(--muted)}
 .ghost[aria-pressed="true"]{border-color:var(--amber)}
+.evBars{position:fixed;left:max(18px,env(safe-area-inset-left,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));width:min(300px,42vw);display:grid;gap:10px;pointer-events:none;z-index:5}
+.evRow{display:grid;grid-template-columns:78px 1fr 48px;align-items:center;gap:10px;padding:9px 12px;background:rgba(10,10,10,.82);border-left:3px solid #fff;transform:skewX(-10deg)}
+.evRow>*{transform:skewX(10deg)}
+.evRow span{font:800 15px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:#fff}
+.evRow i{display:block;height:12px;background:rgba(255,255,255,.14);overflow:hidden}
+.evRow b{display:block;height:100%;background:#fff;transform-origin:left center;transition:transform .25s linear}
+.evRow em{font:800 15px/1 var(--display);font-style:normal;text-align:right;color:#fff}
+.evRow.low{border-left-color:#ff4d4d}
+.evRow.low b{background:#ff4d4d}
+.evRow.crit{animation:evBlink .5s steps(2,end) infinite}
+@keyframes evBlink{50%{background:rgba(120,0,0,.85)}}
+body.ev .gamechat{bottom:calc(140px + env(safe-area-inset-bottom,0px))}
+body.touch .evBars{top:calc(74px + env(safe-area-inset-top,0px));bottom:auto;width:min(240px,55vw);gap:6px}
+body.touch .evRow{padding:6px 10px;grid-template-columns:62px 1fr 40px}
+body.touch.ev .gamechat{top:calc(170px + env(safe-area-inset-top,0px))}
+@media (prefers-reduced-motion:reduce){ .evRow.crit{animation:none} .evRow b{transition:none} }
 #hypo{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 30%,rgba(0,0,0,.75) 78%,rgba(0,0,0,.97) 100%)}
 #hypo.cold{background:radial-gradient(ellipse at 50% 50%,rgba(220,235,255,0) 32%,rgba(200,225,255,.55) 78%,rgba(235,245,255,.92) 100%)}
 #powder{position:fixed;inset:0;pointer-events:none;opacity:0;background-color:transparent;background-image:radial-gradient(ellipse at 50% 58%,rgba(250,247,255,.62) 0%,rgba(246,242,255,.9) 45%,rgba(240,236,252,.97) 100%);background-size:cover}
@@ -449,6 +465,70 @@ body.touch .speedo b{font-size:32px}
 /* results */
 #results .card{animation:hzIn .4s both}
 #career .card{animation:hzIn .4s both;gap:16px}
+/* item shop: full page, rarity tiles */
+#shop.screen{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:0;overflow:hidden;background:#070707 radial-gradient(120% 80% at 50% -10%,#1d1d1d 0%,#070707 60%);z-index:30}
+.shopTop{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:14px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(255,255,255,.1)}
+.shopTitle{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;min-width:0}
+.shopTitle h1{margin:0;font:900 clamp(28px,5vw,46px)/.9 var(--display);letter-spacing:.02em;text-transform:uppercase;font-style:italic;color:#fff}
+.shopTitle span{font:700 13px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:#a3a3a3}
+.shopCoins{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#fff;color:#050505;transform:skewX(-10deg)}
+.shopCoins>*{transform:skewX(10deg)}
+.shopCoins b{font:900 22px/1 var(--display)}
+.coin{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 18%,#e6c25a 19% 55%,#9b7417 56%);box-shadow:inset 0 0 0 2px #6e5110;flex:none}
+.shopCoins .coin{width:20px;height:20px}
+.shopBody{flex:1;overflow-y:auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:26px;align-content:start}
+.shopSec h2{margin:0 0 10px;font:900 22px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;font-style:italic;color:#fff;display:flex;align-items:baseline;gap:12px}
+.shopSec h2 small{font:700 12px/1 var(--display);letter-spacing:.14em;color:#8a8a8a;font-style:normal}
+.shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
+.shopGrid.feat{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.stile{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:4/5;padding:0;border:0;border-radius:4px;overflow:hidden;cursor:pointer;color:#fff;text-align:left;
+  background:var(--rb);box-shadow:inset 0 0 0 2px var(--re);transition:transform .14s ease,box-shadow .14s ease}
+.stile.big{aspect-ratio:auto;min-height:340px}
+.stile:hover,.stile:focus-visible{transform:translateY(-3px);box-shadow:inset 0 0 0 3px #fff;outline:none}
+.stile::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px);pointer-events:none}
+.sArt{position:absolute;inset:0 0 54px 0;display:flex;align-items:center;justify-content:center}
+.sArt img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+.stile.big .sArt{inset:0 0 64px 0}
+.sMeta{position:relative;display:grid;gap:3px;padding:8px 10px 9px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.78) 30%)}
+.sMeta b{font:900 18px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.stile.big .sMeta b{font-size:28px}
+.sMeta small{font:700 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.sPrice{display:flex;align-items:center;gap:6px;font:900 16px/1 var(--display)}
+.sPrice .coin{width:15px;height:15px}
+.stile.own .sPrice{color:#fff;letter-spacing:.12em;font-size:13px}
+.sBadge{position:absolute;top:8px;right:8px;padding:4px 7px;background:#fff;color:#050505;font:900 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase}
+.sNew{position:absolute;top:8px;left:8px;padding:4px 7px;background:#ffe14d;color:#050505;font:900 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase}
+.r-common{--rb:linear-gradient(180deg,#8d969f 0%,#4b525a 100%);--re:#a9b2bb}
+.r-rare{--rb:linear-gradient(180deg,#3b8cf0 0%,#14407e 100%);--re:#6fb0ff}
+.r-epic{--rb:linear-gradient(180deg,#a35cff 0%,#43167f 100%);--re:#c493ff}
+.r-legendary{--rb:linear-gradient(180deg,#e6b947 0%,#6e4a0c 100%);--re:#ffd86b}
+.shopModal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.72);z-index:31}
+.smCard{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);width:min(860px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#0d0d0d;border:1px solid rgba(255,255,255,.14)}
+.smArt{position:relative;height:min(460px,calc(100vh - 34px));background:var(--rb);display:flex;align-items:center;justify-content:center}
+.smArt img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.smInfo{display:flex;flex-direction:column;gap:10px;padding:24px}
+.smRar{align-self:flex-start;padding:4px 8px;font:900 12px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;background:var(--re);color:#050505}
+.smInfo h2{margin:0;font:900 40px/.95 var(--display);text-transform:uppercase;font-style:italic;color:#fff}
+.smKind{margin:0;font:700 13px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:#a3a3a3}
+.smDesc{margin:0;color:#d6d6d6;line-height:1.45}
+.smPrice{display:flex;align-items:center;gap:8px;font:900 26px/1 var(--display);margin-top:auto}
+.smBtns{display:flex;gap:10px;flex-wrap:wrap}
+.smBuy{flex:1;min-width:160px;padding:14px 16px;border:0;background:#fff;color:#050505;font:900 18px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transform:skewX(-8deg)}
+.smBuy:disabled{background:#2a2a2a;color:#8a8a8a;cursor:default}
+.smBuy.eq{background:none;color:#fff;box-shadow:inset 0 0 0 2px #fff}
+@keyframes smPop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+.smCard.bought .smArt{animation:smPop .45s ease}
+@media (max-width:640px){ .smCard{grid-template-columns:1fr} .smArt{height:min(300px,45vh)} .smInfo h2{font-size:32px} .shopGrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} .stile.big{min-height:260px} .shopTop{grid-template-columns:auto 1fr;}
+  .shopCoins{grid-column:2;justify-self:end;grid-row:1} .shopTitle{grid-column:1/-1;grid-row:2} }
+@media (prefers-reduced-motion:reduce){ .stile{transition:none} .smCard.bought .smArt{animation:none} }
+.tagDemo{position:static!important;transform:none!important;font-size:16px!important;padding:6px 14px 7px!important}
+.nettag.tg-chrome{background:linear-gradient(180deg,#f7f8fa 0%,#a3aab3 52%,#e6e9ed 100%)!important;color:#111!important;border-color:#fff!important}
+.nettag.tg-chrome small{color:#333!important}
+.nettag.tg-ice{background:rgba(110,180,255,.28)!important;border-color:#a9dcff!important;box-shadow:0 0 12px rgba(120,200,255,.65);color:#eef8ff!important}
+.nettag.tg-neon{background:rgba(8,8,8,.86)!important;border-color:#ff3fd0!important;box-shadow:0 0 10px #ff3fd0,inset 0 0 8px rgba(255,63,208,.45);color:#ffe0f7!important;text-shadow:0 0 6px #ff3fd0}
+.nettag.tg-gold{background:linear-gradient(180deg,#ffe89a 0%,#c8961e 100%)!important;color:#1a1200!important;border-color:#fff3c4!important}
+.nettag.tg-gold small{color:#3a2a00!important}
+.gi .sw.pv{background-size:contain!important;background-repeat:no-repeat!important;background-position:center!important}
 .coinBar{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;border:1px solid var(--line);background:var(--panel)}
 .coinBar span{font:700 12px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .coinNum{font:800 28px/1 var(--display)}
@@ -553,6 +633,10 @@ body.touch .speedo .num{display:none}
   <div class="hud-tr">
     <div class="stat" id="timeStat"><span class="lbl" id="timeLbl">Riding</span><b id="time">0:00</b></div>
   </div>
+  <div class="evBars" id="evBars" hidden>
+    <div class="evRow"><span>O₂</span><i><b id="ev_o2"></b></i><em id="evn_o2">100%</em></div>
+    <div class="evRow"><span>Warmth</span><i><b id="ev_wm"></b></i><em id="evn_wm">100%</em></div>
+  </div>
   <div class="speedo" id="speedo" aria-label="Speed">
     <svg viewBox="0 0 160 160" aria-hidden="true"><path class="trk" d="M33.3 126.7 A66 66 0 1 1 126.7 126.7"/><path class="arc" id="spdArc" pathLength="100" d="M33.3 126.7 A66 66 0 1 1 126.7 126.7"/><path class="hot" d="M141.0 80.0 A61 61 0 0 1 123.1 123.1"/><line class="tk mj" x1="43.2" y1="116.8" x2="35.5" y2="124.5"/><text class="num" x="50.3" y="109.7">0</text><line class="tk" x1="30.9" y1="112.8" x2="27.6" y2="115.0"/><line class="tk" x1="28.3" y1="101.4" x2="21.8" y2="104.1"/><line class="tk" x1="22.1" y1="91.5" x2="18.2" y2="92.3"/><line class="tk mj" x1="28.0" y1="80.0" x2="17.0" y2="80.0"/><text class="num" x="38.0" y="80.0">20</text><line class="tk" x1="22.1" y1="68.5" x2="18.2" y2="67.7"/><line class="tk" x1="28.3" y1="58.6" x2="21.8" y2="55.9"/><line class="tk" x1="30.9" y1="47.2" x2="27.6" y2="45.0"/><line class="tk mj" x1="43.2" y1="43.2" x2="35.5" y2="35.5"/><text class="num" x="50.3" y="50.3">40</text><line class="tk" x1="47.2" y1="30.9" x2="45.0" y2="27.6"/><line class="tk" x1="58.6" y1="28.3" x2="55.9" y2="21.8"/><line class="tk" x1="68.5" y1="22.1" x2="67.7" y2="18.2"/><line class="tk mj" x1="80.0" y1="28.0" x2="80.0" y2="17.0"/><text class="num" x="80.0" y="38.0">60</text><line class="tk" x1="91.5" y1="22.1" x2="92.3" y2="18.2"/><line class="tk" x1="101.4" y1="28.3" x2="104.1" y2="21.8"/><line class="tk" x1="112.8" y1="30.9" x2="115.0" y2="27.6"/><line class="tk mj" x1="116.8" y1="43.2" x2="124.5" y2="35.5"/><text class="num" x="109.7" y="50.3">80</text><line class="tk" x1="129.1" y1="47.2" x2="132.4" y2="45.0"/><line class="tk" x1="131.7" y1="58.6" x2="138.2" y2="55.9"/><line class="tk" x1="137.9" y1="68.5" x2="141.8" y2="67.7"/><line class="tk mj" x1="132.0" y1="80.0" x2="143.0" y2="80.0"/><text class="num" x="122.0" y="80.0">100</text><line class="tk" x1="137.9" y1="91.5" x2="141.8" y2="92.3"/><line class="tk" x1="131.7" y1="101.4" x2="138.2" y2="104.1"/><line class="tk" x1="129.1" y1="112.8" x2="132.4" y2="115.0"/><line class="tk mj" x1="116.8" y1="116.8" x2="124.5" y2="124.5"/><text class="num" x="109.7" y="109.7">120</text><g class="ndl" id="spdNdl" style="transform:rotate(135deg)"><path d="M78 81.6 L80 78.4 L136 79.6 L136 80.4 Z"/></g><circle class="hub" cx="80" cy="80" r="5.5"/></svg>
     <b id="spd">0</b><span>km/h</span>
@@ -608,7 +692,7 @@ body.touch .speedo .num{display:none}
       <button class="mi" data-sheet="sheetRider"><span>Rider</span><em class="riderSum">Skis</em></button>
       <button class="mi" data-sheet="sheetFit"><span>Fit</span><em class="fitSum">Custom</em></button>
       <button class="mi" data-sheet="sheetChallenges"><span>Challenges</span><em class="chSum">0</em></button>
-      <button class="mi" data-sheet="sheetStore"><span>Store</span><em class="coinSum">0 coins</em></button>
+      <button class="mi" id="shopBtn"><span>Item shop</span><em class="coinSum">0 coins</em></button>
       <button class="mi" data-sheet="sheetSettings"><span>Settings</span><em></em></button>
       <button class="mi" data-sheet="sheetHelp"><span>How to play</span><em></em></button>
     </nav>
@@ -709,12 +793,6 @@ body.touch .speedo .num{display:none}
   <h3 class="lockh">Locker</h3>
   <div id="lockerList"></div>
 </section>
-<section class="sheet" id="sheetStore" hidden aria-label="Store">
-  <header><button class="back">‹ Back</button><h2>Store</h2></header>
-  <div class="coinBar"><span>Your coins</span><b class="coinNum" id="storeCoins">0</b></div>
-  <p class="note">Earn coins on every run: your score, finishing career runs and Everest, and challenges. Spend them here. What you buy shows up in your locker and in Fit.</p>
-  <div id="storeList"></div>
-</section>
 <section class="sheet" id="sheetHelp" hidden aria-label="How to play">
   <header><button class="back">‹ Back</button><h2>How to play</h2></header>
   <button class="go small" id="tutReplay" style="justify-self:start">Play the tutorial<span aria-hidden="true">›</span></button>
@@ -754,6 +832,27 @@ body.touch .speedo .num{display:none}
     </div>
 </section>
 
+<div class="screen shop" id="shop" hidden aria-label="Item shop">
+  <header class="shopTop">
+    <button class="ghost" id="shopBack">‹ Back</button>
+    <div class="shopTitle"><h1>Item shop</h1><span id="shopTimer">New items in —</span></div>
+    <div class="shopCoins" aria-label="Your coins"><i class="coin" aria-hidden="true"></i><b id="shopCoins">0</b></div>
+  </header>
+  <div class="shopBody" id="shopBody"></div>
+  <div class="shopModal" id="shopModal" hidden>
+    <div class="smCard" role="dialog" aria-modal="true" aria-labelledby="smName">
+      <div class="smArt" id="smArt"></div>
+      <div class="smInfo">
+        <span class="smRar" id="smRar"></span>
+        <h2 id="smName"></h2>
+        <p class="smKind" id="smKind"></p>
+        <p class="smDesc" id="smDesc"></p>
+        <div class="smPrice" id="smPrice"></div>
+        <div class="smBtns"><button class="smBuy" id="smBuy"></button><button class="ghost" id="smClose">Close</button></div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="screen" id="career" hidden>
   <div class="card car">
     <div class="eyebrow" id="carEy">Career</div>
@@ -962,10 +1061,38 @@ const LEVELS={
   glades:{name:'Tree Glades', sign:'black',  desc:'Tight trees and deep pillows. Pick a line and hold it.'},
   mega:  {name:'Mega Ramp',   sign:'double', desc:'A huge drop-in, a giant kicker and a long steep landing. Over and over.'},
   pipe:  {name:'Halfpipe',    sign:'black',  desc:'Carve up the walls and launch straight up. Spin and grab above the lip.'},
-  steep: {name:'The Wall',    sign:'double', desc:'An extremely steep face, about 45 degrees, with kickers all the way down. Hang on.'}
+  steep: {name:'The Wall',    sign:'double', desc:'An extremely steep face, about 45 degrees, with kickers all the way down. Hang on.'},
+  everest:{name:'Everest',    sign:'double', desc:'Summit (8,849 m) to base camp: 3.2 km down a huge open face steeper than The Wall. Thin air drains your oxygen and the wind chill drains your warmth. Grab oxygen bottles, warm up at the camps, don\'t pass out.'}
 };
 let LEVEL='back'; try{ const l=localStorage.getItem('off-piste-level'); if(LEVELS[l]) LEVEL=l; }catch(e){}
+/* Everest: summit plateau, then a ~52 degree face (steeper than The Wall) with rolls and rock bands, easing out onto base camp */
+const EV_LEN=3200, EV_N=EV_LEN+900;
+const EVF=[ {k:'crev',d:520,w:7,lip:1.5},  {k:'cliff',d:960,h:9},   {k:'crev',d:1200,w:8,lip:1.7}, {k:'cliff',d:1560,h:13},
+            {k:'gap',d:1820,w:20,lip:5.5,name:'The Icefall'}, {k:'crev',d:2280,w:9,lip:1.9}, {k:'cliff',d:2520,h:11}, {k:'crev',d:2960,w:7,lip:1.5} ];
+const evT=(()=>{ const sl=new Float32Array(EV_N); for(let d=0;d<EV_N;d++){ let v;
+    if(d<35) v=0.22; else if(d<120) v=0.22+(1.3-0.22)*((d-35)/85);
+    else if(d<EV_LEN-280) v=1.3+0.14*Math.sin(d*0.021)+0.08*Math.sin(d*0.057+1.7);
+    else if(d<EV_LEN-110) v=1.3-(1.3-0.06)*((d-(EV_LEN-280))/170); else v=0.06;
+    for(const f of EVF){ if(f.k==='cliff') continue; const a=f.d-(f.k==='gap'?40:75), b=f.d+f.w+(f.k==='gap'?45:25);
+      if(d>=a && d<f.d) v=f.k==='gap'?0.75:0.5; else if(d>=f.d && d<b) v=f.k==='gap'?0.85:0.9; }
+    sl[d]=v; }
+  const sm=new Float32Array(EV_N); for(let i=0;i<EV_N;i++){ let a=0,n=0; for(let j=-8;j<=8;j++){ const k=i+j; if(k>=0&&k<EV_N){ a+=sl[k]; n++; } } sm[i]=a/n; }
+  const cum=new Float32Array(EV_N+1); for(let i=0;i<EV_N;i++) cum[i+1]=cum[i]+sm[i]; return cum; })();
+function evDrop(d){ if(d<=0) return d*0.22; if(d>=EV_N) return evT[EV_N]+(d-EV_N)*0.06; const i=Math.floor(d), t=d-i; return evT[i]+(evT[i+1]-evT[i])*t; }
+// extra shape on top of the smooth face: lips, slots and cliff steps. Returns the change in height at distance d down the hill.
+function evFeatH(d){ let h=0;
+  for(const f of EVF){
+    if(f.k==='cliff'){ if(d>f.d) h-=f.h*Math.min(1,(d-f.d)/1.4); continue; }
+    const L=f.k==='gap'?14:9;
+    if(d>f.d-L && d<=f.d){ const t=(d-(f.d-L))/L; h+=f.lip*t*t; }                       // the lip curls up to the edge
+    if(d>f.d && d<f.d+f.w){ const e=Math.min(d-f.d,f.d+f.w-d); h-=Math.min(1,e/0.7)*30; }  // the slot: 30 m deep, near-vertical walls
+    if(d>=f.d+f.w && d<f.d+f.w+4) h-=0.6*(1-(d-f.d-f.w)/4);
+    if(f.k==='gap' && d>=f.d+f.w) h-=7;   // the far side of the Icefall sits well below the lip                                // far edge sits a touch lower
+  }
+  return h; }
+function evInSlot(d){ for(const f of EVF) if(f.k!=='cliff' && d>f.d+0.3 && d<f.d+f.w-0.3) return f; return null; }
 function center(z){
+  if(LEVEL==='everest') return 0.8*(22*Math.sin(z*0.0045) + 9*Math.sin(z*0.013+1.3));
   if(LEVEL==='pipe'||LEVEL==='mega') return 0;
   const a = LEVEL==='park' ? 0.5 : 1;
   return a*(22*Math.sin(z*0.0055) + 9*Math.sin(z*0.016+1.3)); }
@@ -985,6 +1112,9 @@ function pipeWall(ax){ const d=ax-PIPE_F; if(d<=0) return 0;
   const top=PIPE_R-Math.sqrt(PIPE_R*PIPE_R-dm*dm), e=d-dm; return top + (e>5 ? (e-5)*(e-5)*0.03 : 0); }
 function baseH(x,z){
   if(LEVEL==='pipe') return z*0.36 + pipeWall(Math.abs(x)) + 0.12*Math.sin(z*0.05);
+  if(LEVEL==='everest'){ const c=center(z);
+    // broad ridges and gullies running down the face, plus wind-blown rolls
+    return -evDrop(-z) + evFeatH(-z) + 2.6*Math.sin((x-c)*0.045+z*0.006) + 1.3*Math.sin((x-c)*0.11-z*0.019) + 0.55*(1.1*Math.sin(x*0.09+z*0.045) + 0.7*Math.sin(z*0.12-x*0.06) + 0.32*Math.sin(x*0.21+z*0.17)); }
   const bump = LEVEL==='park'||LEVEL==='mega' ? 0.22 : LEVEL==='steep' ? 0.35 : 1;
   let h = (LEVEL==='mega' ? -megaDrop(-z) : LEVEL==='steep' ? z*STEEP : slopeH(z)) + bump*(1.1*Math.sin(x*0.09+z*0.045) + 0.7*Math.sin(z*0.12-x*0.06) + 0.32*Math.sin(x*0.21+z*0.17));
   const e = Math.abs(x-center(z)) - (LEVEL==='park'||LEVEL==='mega' ? 26 : 20); if(e>0) h += e*e*0.05;
@@ -1283,18 +1413,19 @@ function genChunk(z0,z1){
     while(nextFeatureZ > z1-80 && !pastEnd(nextFeatureZ) && !(GENMOD.boss!=null && nextFeatureZ<GENMOD.boss+70)){ const r=WR();
       if(LEVEL==='park'){ if(r<0.33) spawnKicker(nextFeatureZ); else spawnRail(nextFeatureZ, r>0.66); nextFeatureZ -= GENMOD.feat*wrand(34,52); }
       else if(LEVEL==='glades'){ spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(150,210); }
+      else if(LEVEL==='everest'){ if(r<0.45 && !EVF.some(f=>Math.abs(-nextFeatureZ-f.d)<70)) spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(230,330); }
       else if(LEVEL==='steep'){ spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(55,85); }
       else { if(r<0.45) spawnRail(nextFeatureZ); else spawnKicker(nextFeatureZ); nextFeatureZ -= GENMOD.feat*wrand(70,115); } }
     while(nextGateZ > z1 && !pastEnd(nextGateZ)){ spawnGate(nextGateZ); nextGateZ -= 160; }
   }
-  const nP = LEVEL==='park'||LEVEL==='mega'||LEVEL==='pipe' ? 0 : LEVEL==='glades' ? 1+Math.floor(WR()*3) : WR()<0.75 ? (WR()<0.45?2:1) : 0;
+  const nP = LEVEL==='park'||LEVEL==='mega'||LEVEL==='pipe'||LEVEL==='everest' ? 0 : LEVEL==='glades' ? 1+Math.floor(WR()*3) : WR()<0.75 ? (WR()<0.45?2:1) : 0;
   for(let i=0;i<nP;i++){
     const z=wrand(z1,z0), x=center(z)+wrand(-16,16);
     if(z>-45 || inClear(x,z)) continue;
     const R=wrand(3.5,6.5), p={type:'pillow',x,z,R,R2:R*R,H:wrand(0.8,1.9),key:Math.floor(z/16)};
     if(!buckets.has(p.key)) buckets.set(p.key,[]); buckets.get(p.key).push(p); objs.push(p);
   }
-  const nT = Math.round((LEVEL==='glades' ? 46 : 26)*GENMOD.trees), open = LEVEL==='park'||LEVEL==='mega' ? 27 : LEVEL==='pipe' ? 19 : 13, keep = LEVEL==='glades' ? 0.62 : 0.16;
+  const nT = LEVEL==='everest' ? 0 : Math.round((LEVEL==='glades' ? 46 : 26)*GENMOD.trees), open = LEVEL==='park'||LEVEL==='mega' ? 27 : LEVEL==='pipe' ? 19 : 13, keep = LEVEL==='glades' ? 0.62 : 0.16;
   for(let i=0;i<nT;i++){
     const z=wrand(z1,z0), dx=wrand(-58,58);
     if(Math.abs(dx)<open && (LEVEL==='park'||LEVEL==='mega'||LEVEL==='pipe'||WR()>keep)) continue;
@@ -1307,10 +1438,10 @@ function genChunk(z0,z1){
     const slot=freeT.pop(), y=Math.min(gA,gB,gC,gD,groundH(x,z));
     setTree(slot,x,y,z,s); objs.push({type:'tree',x,z,y,r:0.45*s,h:7*s,slot});
   }
-  for(let i=0;i<Math.round((LEVEL==='back'||LEVEL==='glades'?2:0)*GENMOD.rocks);i++){
-    const z=wrand(z1,z0), x=center(z)+wrand(-28,28);
-    if(z>-50 || inClear(x,z) || !freeR.length) continue;
-    const s=wrand(0.5,1.3), slot=freeR.pop(), y=groundH(x,z);
+  for(let i=0;i<Math.round((LEVEL==='back'||LEVEL==='glades'?2:LEVEL==='everest'?2:0)*GENMOD.rocks);i++){
+    const z=wrand(z1,z0), x=center(z)+wrand(-28,28)*(LEVEL==='everest'?1.5:1);
+    if(z>(LEVEL==='everest'?-120:-50) || (LEVEL==='everest' && EVF.some(f=>-z>f.d-25 && -z<f.d+(f.w||0)+25)) || inClear(x,z) || !freeR.length) continue;
+    const s=wrand(0.5,1.3)*(LEVEL==='everest'?wrand(1.2,2.4):1), slot=freeR.pop(), y=groundH(x,z);
     dummy.position.set(x,y-0.2*s,z); dummy.rotation.set(wrand(0,3),wrand(0,3),wrand(0,3)); dummy.scale.set(s*1.2,s*0.8,s); dummy.updateMatrix(); rocks.setMatrixAt(slot,dummy.matrix);
     objs.push({type:'rock',x,z,y,r:1.0*s,h:0.7*s,slot});
   }
@@ -1725,14 +1856,17 @@ const pGeo=new THREE.BufferGeometry();
 pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3).setUsage(THREE.DynamicDrawUsage));
 pGeo.setAttribute('aSize', new THREE.BufferAttribute(pSize,1));
 pGeo.setAttribute('aAlpha', new THREE.BufferAttribute(pAlpha,1).setUsage(THREE.DynamicDrawUsage));
+const pCol=new Float32Array(MAXP*3).fill(1); let pColDirty=false;
+pGeo.setAttribute('aCol', new THREE.BufferAttribute(pCol,3).setUsage(THREE.DynamicDrawUsage));
 const pUni={uColor:{value:new THREE.Color(1,0.95,1)}, uScale:{value:600}, uMaxPx:{value:200}};
-const pVS='uniform float uScale; uniform float uMaxPx; attribute float aSize; attribute float aAlpha; varying float vA; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); float z=-mv.z; gl_PointSize=min(aSize*uScale/max(0.5,z), uMaxPx); vA=aAlpha*smoothstep(1.6,4.2,z); gl_Position=projectionMatrix*mv; }';
-const pFS='uniform vec3 uColor; varying float vA; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.05,d); if(a*vA<0.01) discard; gl_FragColor=vec4(uColor,a*vA); }';
+const pVS='uniform float uScale; uniform float uMaxPx; attribute float aSize; attribute float aAlpha; attribute vec3 aCol; varying float vA; varying vec3 vC; void main(){ vC=aCol; vec4 mv=modelViewMatrix*vec4(position,1.0); float z=-mv.z; gl_PointSize=min(aSize*uScale/max(0.5,z), uMaxPx); vA=aAlpha*smoothstep(1.6,4.2,z); gl_Position=projectionMatrix*mv; }';
+const pFS='uniform vec3 uColor; varying float vA; varying vec3 vC; void main(){ float d=length(gl_PointCoord-0.5); float a=smoothstep(0.5,0.05,d); if(a*vA<0.01) discard; gl_FragColor=vec4(uColor*vC,a*vA); }';
 const pMat=new THREE.ShaderMaterial({uniforms:pUni, vertexShader:pVS, fragmentShader:pFS, transparent:true, depthWrite:false});
 const points=new THREE.Points(pGeo,pMat); points.frustumCulled=false; scene.add(points);
-function emit(x,y,z,vx,vy,vz,size,life){
+function emit(x,y,z,vx,vy,vz,size,life,col){
   if(GFX.parts<1 && Math.random()>GFX.parts) return;   // lower graphics: fewer, same-looking puffs
   const i=pNext; pNext=(pNext+1)%MAXP;
+  { const k=i*3, r=col?col[0]:1, g=col?col[1]:1, b=col?col[2]:1; if(pCol[k]!==r||pCol[k+1]!==g||pCol[k+2]!==b){ pCol[k]=r; pCol[k+1]=g; pCol[k+2]=b; pColDirty=true; } }
   pPos[i*3]=x; pPos[i*3+1]=y; pPos[i*3+2]=z; pVel[i*3]=vx; pVel[i*3+1]=vy; pVel[i*3+2]=vz;
   pSize[i]=size; pLife[i]=life; pAge[i]=0;
 }
@@ -1742,6 +1876,8 @@ function burst(x,y,z,n,pow){
     emit(x+rand(-0.4,0.4), y+0.1, z+rand(-0.4,0.4), Math.cos(a)*s+P.vx*0.25, rand(1.5,6)*pow, Math.sin(a)*s+P.vz*0.25, rand(0.6,1.7), rand(0.8,1.7)); }
 }
 function updateParticles(dt){
+  if(typeof trailTick==='function') trailTick(dt);
+  if(pColDirty){ pGeo.attributes.aCol.needsUpdate=true; pColDirty=false; }
   pUni.uMaxPx.value=Math.max(60,renderer.domElement.height*0.2);
   const drag=Math.exp(-1.7*dt);
   for(let i=0;i<MAXP;i++){
@@ -1798,6 +1934,7 @@ const fGeo=new THREE.BufferGeometry();
 fGeo.setAttribute('position', new THREE.BufferAttribute(fPos,3).setUsage(THREE.DynamicDrawUsage));
 fGeo.setAttribute('aSize', new THREE.BufferAttribute(fSize,1));
 fGeo.setAttribute('aAlpha', new THREE.BufferAttribute(fAlpha,1));
+fGeo.setAttribute('aCol', new THREE.BufferAttribute(new Float32Array(NF*3).fill(1),3));
 const flakes=new THREE.Points(fGeo, pMat); flakes.frustumCulled=false; scene.add(flakes);
 let fT=0, curFlakeScale=1;
 function flakeScale(v){ if(v===curFlakeScale) return; for(let i=0;i<NF;i++) fSize[i]*=v/curFlakeScale; curFlakeScale=v; fGeo.attributes.aSize.needsUpdate=true; }
@@ -2124,7 +2261,7 @@ function setText(k,v){ if(hudCache[k]!==v){ hudCache[k]=v; hudEls[k].textContent
 // T: plant both poles and shove. Strong from a standstill, fading out by ~70 km/h.
 const PUSH_T=0.75;
 const PUSHP={tip:[null,null],out:[false,false],len:[1.18,1.18],tl:[null,null]}, pushV1=new THREE.Vector3(), pushV2=new THREE.Vector3();
-function startPush(){ if(BOARD || state!=='play' || P.air || P.grind || P.crash>0 || (P.pushT||0)>0.12) return; P.pushT=PUSH_T; TUT.pushed=1; if(RUNMODE==='everest') evPush(); }
+function startPush(){ if(BOARD || state!=='play' || P.air || P.grind || P.crash>0 || (P.pushT||0)>0.12) return; P.pushT=PUSH_T; TUT.pushed=1; if(EV.on) evPush(); }
 function endPress(){ const t=P.pressT||0; P.pressT=0; hideLive();
   if(t>0.5) addTrick({name:(t>2.5?'Long tail press':'Tail press'),pts:Math.round(80+t*260),perfect:false}); }
 function popStrength(){ return 2.6+(P.charge/0.4)*3.0; }
@@ -2356,7 +2493,7 @@ function groundStep(dt){
   const tuck=IN.y>0.3?IN.y:0, brake=(IN.y<-0.3&&!P.noBrake)?-IN.y:0;
   const sp=Math.hypot(vF,vL);
   const turnDrag = sp>4 && LEVEL!=='pipe' ? Math.abs(P.turn)*(0.05+0.32*turnSig) : 0;     // only big, held turns really slow you down
-  const k=(0.0032-tuck*0.0015)*sp+0.025+(LEVEL==='steep'?0.13:0)+brake*1.1+P.charge*0.15+turnDrag+P.hk*2.4;
+  const k=(0.0032-tuck*0.0015)*sp+0.025+(LEVEL==='steep'?0.13:LEVEL==='everest'?0.17:0)+brake*1.1+P.charge*0.15+turnDrag+P.hk*2.4;
   const f=Math.exp(-k*dt); vF*=f; vL*=f;
   if(P.hk>0.05){ const s1=Math.hypot(vF,vL), d=P.hk*9*dt, q=s1>d?(s1-d)/s1:0; vF*=q; vL*=q; }   // edges dig in: about a second from cruising speed
   if(hkIn && Math.hypot(vF,vL)<0.8){ vF=0; vL=0; }      // dead stop
@@ -2566,7 +2703,7 @@ function updateCamera(dt,now){
   // pitch is measured from the slope, not the horizon: on a steep pitch the camera rides up with the hill behind you
   const hx=Math.sin(CAM.yaw), hz=Math.cos(CAM.yaw), g0=physH(P.x,P.z), up=(physH(P.x+hx*3,P.z+hz*3)-g0)/3;
   camSlope+=(Math.atan(up)-camSlope)*Math.min(1,4*dt);
-  const pe=clamp(CAM.pitch+camSlope*(LEVEL==='steep'?0.32:0.75),-0.4,1.45), cp=Math.cos(pe), ox=hx*cp, oy=Math.sin(pe), oz=hz*cp;
+  const pe=clamp(CAM.pitch+camSlope*(LEVEL==='steep'||LEVEL==='everest'?0.32:0.75),-0.4,1.45), cp=Math.cos(pe), ox=hx*cp, oy=Math.sin(pe), oz=hz*cp;
   // pull in if the slope or a ramp is between the camera and the rider, so it never looks through the snow
   let d=CAM.dist;
   for(let k=1;k<=6;k++){ const t=k/6*d, x=camFocus.x+ox*t, y=camFocus.y+oy*t, z=camFocus.z+oz*t;
@@ -2637,7 +2774,7 @@ function updateHud(){
 }
 
 /* ---------- Flow ---------- */
-function show(id){ if(id) tutHide(); closeSheet(); ['title','pause','results','career'].forEach(s=>$(s).hidden=s!==id); if(typeof CAR!=='undefined') CAR.open=id==='career'; }
+function show(id){ if(id) tutHide(); closeSheet(); ['title','pause','results','career','shop'].forEach(s=>$(s).hidden=s!==id); if(typeof CAR!=='undefined') CAR.open=id==='career'; }
 let sheetOpen=null, sheetFrom=null;
 function openSheet(id){ const el=$(id); if(!el) return; sheetFrom=document.activeElement; closeSheet(true); el.hidden=false; sheetOpen=el;
   const b=el.querySelector('.back'); if(b) b.focus(); }
@@ -2742,7 +2879,6 @@ const MODES={
   avalanche:{name:'Avalanche',sign:'double',desc:'The slope lets go behind you. Outrun it 1.5 km down to the rescue hut. Slow down or crash too much and it swallows you.',level:'back'},
   night:{name:'Night run',sign:'black',desc:'Your mountain after dark: headlamp on, glowing gates, a sky full of stars. Every gate you pass is +250.'},
   daily:{name:'Daily challenge',sign:'green',desc:''},
-  everest:{name:'Everest',sign:'double',desc:'Ski from the summit (8,849 m) to base camp, 3.2 km down a steep, rocky face. Thin air drains your oxygen and the wind chill drains your warmth: grab oxygen bottles, warm up at the camps, and don\'t pass out.'},
   career:{name:'Career',sign:'double',desc:'Three worlds of runs to the finish. Pick your next run, hit the bonus goal for an extra life, and land each world\'s boss jump. Crash too often and it\'s over.'}
 };
 MODE='free'; try{ const m=localStorage.getItem('off-piste-mode'); if(MODES[m]) MODE=m; }catch(e){}
@@ -2752,7 +2888,7 @@ const pastEnd=z=>COURSE_END!=null && z<COURSE_END+60;
 // the run eases out onto a gentle flat over the last 70 m before the finish, where the hut stands
 function slopeH(z){ if(COURSE_END==null) return z*SLOPE; const W=70, Z0=COURSE_END+W; if(z>=Z0) return z*SLOPE;
   const d=Z0-z, x=Math.min(1,d/W), f=d<W ? W*(x*x*x-x*x*x*x/2) : d-W/2; return z*SLOPE+(SLOPE-0.04)*f; }
-function modeSeed(){ return RUNMODE==='everest' ? 8849 : RUNMODE==='career'&&CAR.node ? CAR.node.seed : RUNMODE==='avalanche'||RUNMODE==='race' ? 101 : RUNMODE==='daily' ? 202 : 0; }
+function modeSeed(){ return LEVEL==='everest' ? 8849 : RUNMODE==='career'&&CAR.node ? CAR.node.seed : RUNMODE==='avalanche'||RUNMODE==='race' ? 101 : RUNMODE==='daily' ? 202 : 0; }
 const fmtTime=t=>Math.floor(t/60)+':'+(t%60).toFixed(2).padStart(5,'0');
 const myNameMain=()=>{ let n=''; try{ n=(localStorage.getItem('violet-hour-name')||'').trim().slice(0,16); }catch(e){} return n||'Rider'; };
 
@@ -2872,7 +3008,7 @@ function modeWorld(){
   objs.push({type:'finish',x:center(z),z,mesh:buildFinish(z)});
   objs.push({type:'hut',x:hx,z:hz,mesh:buildHut(hx,hz)});
   if(GENMOD.boss!=null) carBossKicker();
-  if(RUNMODE==='everest') evWorld();
+  if(EV.on) evWorld();
   hutLamp.intensity=1.6;
 }
 
@@ -2914,12 +3050,14 @@ function raceRows(){
   return rows.sort((a,b)=>key(a)-key(b));
 }
 const ord=n=>n+(n%10===1&&n%100!==11?'st':n%10===2&&n%100!==12?'nd':n%10===3&&n%100!==13?'rd':'th');
-function netExtra(){ const o={g:[GEAR.ski,GEAR.sticker,okCol(GEAR.skiC)?GEAR.skiC:-1,okCol(GEAR.poleC)?GEAR.poleC:-1],lk:LOOK};
+function netExtra(){ const o={g:[GEAR.ski,GEAR.sticker,okCol(GEAR.skiC)?GEAR.skiC:-1,okCol(GEAR.poleC)?GEAR.poleC:-1],ac:accWorn(),lk:LOOK,t:Math.round(performance.now()),v:[Math.round(P.vx*100)/100,Math.round(P.vy*100)/100,Math.round(P.vz*100)/100]};
   if(RACE.host && (RACE.pending||RACE.on) && Date.now()<RACE.at+2000) o.rc={id:RACE.id,at:RACE.at};
   if(RACE.id && RACE.myT!=null) o.rr={id:RACE.id,t:Math.round(RACE.myT*100)/100};
   if(RACE.id && RUNMODE==='race' && state==='play') o.rp={id:RACE.id,z:Math.round(P.z)};
   return o; }
 function modeIngest(r,pres){
+  if(Array.isArray(pres.ac) && pres.ac.length===4){ const v=pres.ac.map((x,i)=>{ const Lst=[BACKS,HATS,TRAILS,TAGS][i]; x=x|0; return x>0&&x<Lst.length?x:0; }), key=v.join(',');
+    if(key!==r.acK){ r.acK=key; accRemote(r,v); } }
   if(Array.isArray(pres.g)){ const si=pres.g[0]|0, gk=si+','+pres.g[2]+','+pres.g[3]; if(SKI_COLS[si] && gk!==r.gk){ r.gk=gk; r.ski=si; paintSki(r.mats,si,pres.g[2],pres.g[3]); } }
   const rc=pres.rc; r.rc = rc && typeof rc.id==='string' && /^[a-z0-9]{3,12}$/.test(rc.id) && Number.isFinite(+rc.at) ? {id:rc.id,at:+rc.at} : null;
   if(r.rc) raceSeen(r);
@@ -2932,7 +3070,7 @@ const GFPS=8, GMAX=GFPS*240;
 const GH={on:true,rec:null,dv:null,play:null,g:null,nodes:null,cloth:null,key:null};
 try{ GH.on=localStorage.getItem('off-piste-ghost')!=='off'; }catch(e){}
 const GHOST_MAT=new THREE.MeshLambertMaterial({color:L(0x9edcff),emissive:L(0x1f5a80),transparent:true,opacity:0.34,depthWrite:false});
-function ghostKey(){ if(RUNMODE==='race'||RUNMODE==='bigair'||RUNMODE==='career') return null; if(RUNMODE==='everest') return 'everest'; if(RUNMODE==='daily') return 'daily'+DAILY.day; if(RUNMODE==='avalanche') return 'avalanche'; return RUNMODE+'-'+LEVEL; }
+function ghostKey(){ if(RUNMODE==='race'||RUNMODE==='bigair'||RUNMODE==='career') return null; if(RUNMODE==='daily') return 'daily'+DAILY.day; if(RUNMODE==='avalanche') return 'avalanche'; return RUNMODE+'-'+LEVEL; }
 function ghostMeta(){ try{ return JSON.parse(localStorage.getItem('op-ghost-meta')||'{}')||{}; }catch(e){ return {}; } }
 function ghostRecStart(){ GH.key=ghostKey(); GH.rec=null; if(!GH.key) return; const fb=12+(POSE_LEN-3)*2; GH.rec={buf:new ArrayBuffer(fb*GMAX),fb,n:0}; GH.dv=new DataView(GH.rec.buf); }
 function ghostRecTick(){ const r=GH.rec; if(!r) return; const want=Math.floor(elapsed*GFPS);
@@ -3008,7 +3146,7 @@ const STICKERS=[{name:'None'},{name:'Star',need:2},{name:'Bolt',need:4},{name:'S
 OUTFITS.push(...OUTFITS_STORE);
 SKI_COLS.forEach(i=>i.kind='skis'); STICKERS.forEach(i=>i.kind='sticker'); OUTFITS.forEach(i=>i.kind='outfit');
 const GEAR={ski:0,sticker:0,skiC:null,poleC:null}; try{ const g=JSON.parse(localStorage.getItem('op-gear')||'{}'); if(SKI_COLS[g.ski]) GEAR.ski=g.ski; if(STICKERS[g.sticker]) GEAR.sticker=g.sticker; if(okCol(g.skiC)) GEAR.skiC=g.skiC; if(okCol(g.poleC)) GEAR.poleC=g.poleC; }catch(e){}
-const allGear=()=>[...OUTFITS,...SKI_COLS,...STICKERS];
+const allGear=()=>[...OUTFITS,...SKI_COLS,...STICKERS,...(SHOP_EXTRA||[])];
 function gearOk(it){ if(it.cost) return STORE.owned.has(it.kind+':'+it.name); return it.req ? CH_DONE.has(it.req) : CH_DONE.size>=(it.need||0); }
 allGear().forEach(it=>it._ok=gearOk(it));
 function lockTxt(it){ if(it.cost) return 'Store · '+fmt(it.cost)+' coins'; if(it.req){ const c=CHALLENGES.find(x=>x.id===it.req); return c?c.name:''; } return it.need+(it.need===1?' challenge':' challenges'); }
@@ -3048,7 +3186,7 @@ function placeSticker(){ const m=STK.mesh, d=STICKERS[GEAR.sticker]||STICKERS[0]
     bp.setXYZ(i,px,py,bz+0.007); }
   base.computeVertexNormals(); m.geometry.dispose(); m.geometry=base; m.position.set(0,0,0); m.rotation.set(0,0,0);
 }
-function applyGear(){ paintSki(R.SLOTS,GEAR.ski,GEAR.skiC,GEAR.poleC); placeSticker(); try{ localStorage.setItem('op-gear',JSON.stringify(GEAR)); }catch(e){}
+function applyGear(){ paintSki(R.SLOTS,GEAR.ski,GEAR.skiC,GEAR.poleC); placeSticker(); if(SHOP_READY) applyAcc(); try{ localStorage.setItem('op-gear',JSON.stringify(GEAR)); }catch(e){}
   document.querySelectorAll('.skiBtn').forEach(b=>b.textContent=SKI_COLS[GEAR.ski].name);
   document.querySelectorAll('.stickerBtn').forEach(b=>b.textContent=STICKERS[GEAR.sticker].name); }
 document.querySelectorAll('.skiBtn').forEach(b=>b.addEventListener('click',()=>{ GEAR.ski=nextUnlocked(SKI_COLS,GEAR.ski); GEAR.skiC=null; applyGear(); renderLocker(); }));
@@ -3081,7 +3219,8 @@ function modePre(){
   if(RUNMODE==='night'){ SKY_HOLD={l:LIGHT,w:WEATHER}; LIGHT='night'; WEATHER='clear'; syncSky(); }
   GENMOD.trees=1; GENMOD.feat=1; GENMOD.boss=null; GENMOD.rocks=1; SLOPE=SLOPE0;
   if(RUNMODE==='career') carPre();
-  if(RUNMODE==='everest') evPre();
+  EV.on = LEVEL==='everest' && RUNMODE!=='career';
+  if(EV.on) evPre();
 }
 function modePost(){
   CD.t=0; CD.last=0; FIN.done=false; FIN.t=0; NG.n=0; BA.n=0; BA.wait=0; BA.over=0; BA.scores=[]; combo.rails=0;
@@ -3091,7 +3230,7 @@ function modePost(){
   if(m==='daily') CD.t=3;
   if(m==='bigair'){ BA.n=1; baAttempt(); }
   if(m==='career') carPost();
-  if(m==='everest') evPost();
+  if(EV.on) evPost(); else evHide();
   if(m==='race'){ RACE.on=true; RACE.pending=false; RACE.myT=null; RACE.won=false; RACE.lastZ=0; }
   else { RACE.on=false; RACE.host=false; RACE.pending=false; }
   $('timeLbl').textContent = m==='daily' ? 'Time left' : 'Riding';
@@ -3099,7 +3238,7 @@ function modePost(){
   ghostLoad(); ghostRecStart(); modeHudUpdate();
 }
 function modeExit(){
-  { const hy=$('hypo'); if(hy) hy.style.opacity='0'; }
+  EV.on=false; evHide();
   restoreSky(); ghostHide(); GH.rec=null; RUNMODE='free'; LEVEL=USER_LEVEL; COURSE_END=null; GENMOD.trees=1; GENMOD.feat=1; GENMOD.boss=null; GENMOD.rocks=1; SLOPE=SLOPE0;
   RACE.on=false; RACE.pending=false; RACE.host=false; CD.t=0; BA.wait=BA.over=0; AV.on=false; avRumble(0);
   $('modeHud').hidden=true; $('count').classList.remove('show');
@@ -3116,7 +3255,7 @@ function modeHudUpdate(){
   else if(m==='bigair'){ t='BIG AIR · ATTEMPT '+Math.min(3,BA.n)+' / 3'; s='Best '+(BA.scores.length?fmt(Math.max(...BA.scores)):'—')+(BA.cur?' · this one '+fmt(BA.cur):''); }
   else if(m==='daily'){ t='DAILY · '+DAILY.feat.label.toUpperCase()+' ×2'; s='Your best today '+(dailyBest?fmt(dailyBest):'—'); }
   else if(m==='night'){ t='NIGHT RUN · '+NG.n+(NG.n===1?' gate':' gates'); }
-  else if(m==='everest'){ const h=evHud(); t=h.t; s=h.s; bar=h.bar; warn=h.warn; }
+  else if(EV.on){ const h=evHud(); t=h.t; s=h.s; bar=h.bar; warn=h.warn; }
   else if(m==='career' && CAR.node){ const h=carHud(); t=h.t; s=h.s; bar=h.bar; warn=h.warn; }
   if(GH.play) s=s?s+' · '+GH.play.label:GH.play.label;
   const key=t+'|'+s+'|'+(bar*60|0)+warn;
@@ -3131,7 +3270,7 @@ function modeTick(rdt){
   if(AV.swallowed){ AV.swallowT-=rdt; facePowder(1); if(AV.swallowT<=0){ endRun(); return; } }
   if(COURSE_END!=null && !FIN.done && !AV.swallowed && P.z<COURSE_END){
     FIN.done=true; FIN.time=elapsed; FIN.t=2.8; sfxBank();
-    if(RUNMODE==='career') carFinish(); else if(RUNMODE==='everest') evFinish(); else { chDone('hut'); showTrick('Rescued',fmtTime(FIN.time)+' to the hut'); }
+    if(RUNMODE==='career') carFinish(); else if(EV.on) evFinish(); else { chDone('hut'); showTrick('Rescued',fmtTime(FIN.time)+' to the hut'); }
     if(RUNMODE==='race'){ RACE.myT=FIN.time; const rows=raceRows(); if(rows.length>1 && rows[0].me){ RACE.won=true; chDone('race'); } } }
   if(FIN.done){ const k=Math.exp(-1.4*rdt); P.vx*=k; P.vz*=k; FIN.t-=rdt; if(FIN.t<=0){ endRun(); return; } }
   if(HUT && Math.abs(P.z-HUT.z)<260 && Math.random()<rdt*6) emit(HUT.smoke.x+rand(-0.2,0.2),HUT.smoke.y,HUT.smoke.z+rand(-0.2,0.2),rand(-0.3,0.3)+0.6,rand(1,1.8),rand(-0.3,0.3),rand(0.8,1.6),rand(2,3.5));
@@ -3143,7 +3282,7 @@ function modeTick(rdt){
       else if(!BA.past && P.crash<=0 && Math.hypot(P.vx,P.vz)<1.5){ BA.still+=rdt; if(BA.still>3) baFinish(); } else BA.still=0; } }
   if(RUNMODE==='daily' && !hold && elapsed>=DAILY.time){ endRun(); return; }
   if(RUNMODE==='career' && carTick(rdt)){ endRun(); return; }
-  if(RUNMODE==='everest' && evTick(rdt,hold)){ endRun(); return; }
+  if(EV.on && evTick(rdt,hold)){ endRun(); return; }
   if(RUNMODE==='race' && state==='play') RACE.lastZ=P.z;
   if(stats.top>=90) chDone('spd90'); if(stats.air>=3) chDone('air3');
   if(!hold) ghostRecTick(); ghostTick();
@@ -3157,7 +3296,7 @@ function modeTrick(tr){
   if(RUNMODE==='bigair' && BA.n>=1 && BA.n<=3 && !BA.wait && P.z<-(MEGA_LIP-30)) BA.cur=Math.max(BA.cur,tr.pts*Math.max(1,combo.mult));
 }
 function modeBank(total){ if(total>=10000) chDone('c10k'); }
-function modeCrash(){ if(AV.on && !AV.swallowed){ CP.x=P.x; CP.z=P.z-1; } if(RUNMODE==='career') carCrash(); if(RUNMODE==='everest') evCrash(); }
+function modeCrash(){ if(AV.on && !AV.swallowed){ CP.x=P.x; CP.z=P.z-1; } if(RUNMODE==='career') carCrash(); if(EV.on) evCrash(); }
 function modeEnd(){
   const m=RUNMODE, out={eyebrow:'Run complete',row:null,lb:null};
   CD.t=0; $('count').classList.remove('show'); avRumble(0); $('modeHud').hidden=true; MH.key='';
@@ -3174,7 +3313,7 @@ function modeEnd(){
     out.row=['Your best today',dailyBest?fmt(dailyBest):'—']; out.lb='daily'; lbWatch(); }
   else if(m==='night'){ out.eyebrow='Night run'; out.row=['Gates passed',String(NG.n)]; }
   else if(m==='career') carEnd(out);
-  else if(m==='everest') evEnd(out);
+  if(EV.on && m!=='career') evEnd(out);
   if(GH.rec){ const sc = m==='avalanche' ? (FIN.done?FIN.time:null) : (m==='daily' && elapsed<DAILY.time-0.05 ? null : stats.score);
     if(sc!=null && sc>0 && ghostSave(sc)) out.ghost=true; }
   GH.rec=null; ghostHide();
@@ -3318,8 +3457,8 @@ $('carNew').addEventListener('click',()=>{ carNew(); careerOpen(); });
 
 /* ---------- Everest: summit to base camp. Thin air drains your oxygen, the wind chill drains your warmth.
    Grab oxygen bottles on the way down and warm up at the camps. Run out of either and you pass out. ---------- */
-const EV_LEN=3200, EV_TOP=8849, EV_BASE=5364;
-const EV={o2:100,warm:100,dead:0,why:'',items:[],t:0,wind:0,best:null,lowAlt:EV_TOP,camps:0,bottles:0};
+const EV_TOP=8849, EV_BASE=5364;
+const EV={on:false,o2:100,warm:100,dead:0,why:'',items:[],t:0,wind:0,best:null,lowAlt:EV_TOP,camps:0,bottles:0};
 try{ const b=parseFloat(localStorage.getItem('op-everest')); if(b>0) EV.best=b; }catch(e){}
 const EVM={bottle:new THREE.MeshStandardMaterial({color:L(0xc8262b),roughness:0.35,metalness:0.4,emissive:L(0x5a0a0c),emissiveIntensity:0.6}),
   cap:new THREE.MeshStandardMaterial({color:L(0xd9dde3),roughness:0.3,metalness:0.8}),
@@ -3339,21 +3478,23 @@ function evCamp(x,z,n){ const g=new THREE.Group(), y=groundH(x,z);
   g.position.set(x,y,z); scene.add(g); const o={type:'camp',x,z,mesh:g,got:false,n}; objs.push(o); EV.items.push(o);
   clears.push({x,w:9,top:z+8,bot:z-8}); }
 function evWorld(){ EV.items=[];
-  for(let z=-220, i=0; z>-EV_LEN+120; z-=260, i++){ const x=center(z)+(i%2?1:-1)*wrand(5,12); clears.push({x,w:3,top:z+6,bot:z-6}); evBottle(x,z); }
+  for(const f of EVF){ spawnGate(-(f.d-(f.k==='gap'?230:95))); EV.signs=EV.signs||[]; }
+  for(let z=-150, i=0; z>-EV_LEN+120; z-=250, i++){ if(EVF.some(f=>-z>f.d-30 && -z<f.d+(f.w||0)+30)) z-=60; const x=center(z)+(i%2?1:-1)*wrand(5,12); clears.push({x,w:3,top:z+6,bot:z-6}); evBottle(x,z); }
   for(let z=-650, n=1; z>-EV_LEN+200; z-=700, n++) evCamp(center(z)+16,z,n);
 }
-function evPre(){ COURSE_END=-EV_LEN; LEVEL='back'; SLOPE=0.46; GENMOD.trees=0.06; GENMOD.rocks=4; GENMOD.feat=1.7;
-  SKY_HOLD={l:LIGHT,w:WEATHER}; LIGHT='day'; WEATHER='snow'; syncSky(); }
-function evPost(){ Object.assign(EV,{o2:100,warm:100,dead:0,why:'',t:0,wind:0,lowAlt:EV_TOP,camps:0,bottles:0});
+function evPre(){ COURSE_END=-EV_LEN;
+  if(!SKY_HOLD){ SKY_HOLD={l:LIGHT,w:WEATHER}; if(LIGHT!=='night') LIGHT='day'; WEATHER='clear'; syncSky(); } }
+function evPost(){ document.body.classList.add('ev'); $('evBars').hidden=false; EV.warned=0; Object.assign(EV,{o2:100,warm:100,dead:0,why:'',t:0,wind:0,lowAlt:EV_TOP,camps:0,bottles:0});
   showTrick('Summit '+fmt(EV_TOP)+' m','get to base camp alive'); }
 function evDie(why){ if(EV.dead>0) return; EV.dead=2; EV.why=why; showTrick('Passed out',why,true); P.vx*=0.3; P.vz*=0.3; }
 function evTick(dt,hold){
   const hy=$('hypo');
   if(EV.dead>0){ EV.dead-=dt; if(hy) hy.style.opacity=String(Math.min(1,1-EV.dead/2+0.4)); return EV.dead<=0; }
+  evBars();
   if(hold || FIN.done){ if(hy) hy.style.opacity='0'; return false; }
   EV.t+=dt; const sp=Math.hypot(P.vx,P.vz), hi=clamp(-P.z/EV_LEN,0,1), alt=1-hi;
   EV.lowAlt=Math.min(EV.lowAlt,evAlt());
-  EV.o2-=(0.72+0.6*alt+(P.tuck>0.5?0.2:0))*dt;
+  EV.o2-=(0.6+0.5*alt+(P.tuck>0.5?0.2:0))*dt;
   EV.warm-=(0.35+sp*0.022+(P.air?0.4:0))*dt;
   // gusts push you across the hill, harder up high
   const gust=Math.sin(EV.t*0.37)*Math.sin(EV.t*0.91+1.3); EV.wind=gust*(1.2+2.4*alt);
@@ -3363,6 +3504,10 @@ function evTick(dt,hold){
   for(const o of EV.items){ if(o.got || !o.mesh) continue;
     if(o.type==='o2'){ o.mesh.children[1].rotation.y+=dt*2; if(Math.abs(P.z-o.z)<2.2 && Math.abs(P.x-o.x)<2.2){ o.got=true; o.mesh.visible=false; EV.o2=Math.min(100,EV.o2+28); EV.bottles++; sfxBank(); showTrick('Oxygen','+28%'); } }
     else if(o.type==='camp' && P.z<o.z){ o.got=true; EV.camps++; EV.warm=Math.min(100,EV.warm+40); EV.o2=Math.min(100,EV.o2+8); showTrick('Camp '+o.n,'warmed up +40'); } }
+  { const f=evInSlot(-P.z); if(f && P.crash<=0 && P.y < Math.min(physH(P.x,-(f.d)),physH(P.x,-(f.d+f.w+0.5)))-5){ P.vx=P.vz=0; P.vy=0; crash(f.k==='gap'?'Fell into the Icefall':'Fell into a crevasse'); } }
+  // heads-up before each one
+  for(const f of EVF){ const d=-P.z, ahead=f.d-d; if(ahead<170 && ahead>150 && EV.warned!==f.d){ EV.warned=f.d;
+      showTrick(f.k==='gap'?f.name:f.k==='crev'?'Crevasse ahead':'Cliff ahead', f.k==='cliff'?'big drop, land it':f.k==='gap'?'huge gap: full speed, hit the lip':'carry speed and jump it'); } }
   if(EV.o2<=0){ EV.o2=0; evDie('ran out of oxygen'); }
   else if(EV.warm<=0){ EV.warm=0; evDie('too cold'); }
   if(hy){ const k=Math.max(clamp((35-EV.o2)/35,0,1),clamp((30-EV.warm)/30,0,1)*0.8); hy.style.opacity=(k*0.85).toFixed(3); hy.classList.toggle('cold',EV.warm<EV.o2); }
@@ -3371,39 +3516,267 @@ function evTick(dt,hold){
 function evCrash(){ if(EV.dead>0||FIN.done) return; EV.o2-=10; EV.warm-=12; hudEls.toast.textContent='−10% O₂ · −12% warmth'; }
 function evPush(){ EV.o2-=2.2; }
 function evFinish(){ showTrick('Base camp',fmtTime(FIN.time)); }
-function evEnd(out){ const hy=$('hypo'); if(hy) hy.style.opacity='0';
+function evEnd(out){ evHide();
   if(FIN.done){ out.eyebrow='Base camp reached'; out.row=['Summit to base camp',fmtTime(FIN.time)];
     if(!EV.best||FIN.time<EV.best){ EV.best=FIN.time; try{ localStorage.setItem('op-everest',String(FIN.time)); }catch(e){} } }
   else { out.eyebrow=EV.dead>0||EV.why?'Passed out':'Run ended'; out.row=['Made it down to',fmt(EV.lowAlt)+' m'+(EV.why?' · '+EV.why:'')]; } }
+function evHide(){ const hy=$('hypo'); if(hy) hy.style.opacity='0'; const b=$('evBars'); if(b) b.hidden=true; document.body.classList.remove('ev'); }
+function evBars(){ for(const [k,v] of [['o2',EV.o2],['wm',EV.warm]]){ const f=$('ev_'+k), n=$('evn_'+k), row=f.parentNode.parentNode;
+    f.style.transform='scaleX('+(clamp(v,0,100)/100).toFixed(3)+')'; n.textContent=Math.round(v)+'%'; row.classList.toggle('low',v<30); row.classList.toggle('crit',v<15); } }
 function evHud(){ const lo=Math.min(EV.o2,EV.warm);
-  return {t:'EVEREST · '+fmt(evAlt())+' m', s:'O₂ '+Math.round(EV.o2)+'% · Warmth '+Math.round(EV.warm)+'%'+(Math.abs(EV.wind)>2?' · wind '+(EV.wind>0?'→':'←'):''), bar:lo/100, warn:lo<30}; }
+  return {t:'EVEREST · '+fmt(evAlt())+' m', s:fmt(Math.max(0,Math.round(P.z-COURSE_END)))+' m to base camp'+(Math.abs(EV.wind)>2?' · wind '+(EV.wind>0?'→':'←'):''), bar:-1, warn:lo<30}; }
 
 
 /* ---------- Coins and the store: coins come from runs, career and Everest; spend them on gear ---------- */
 function coinSave(){ try{ localStorage.setItem('op-coins',String(STORE.coins)); localStorage.setItem('op-owned',JSON.stringify([...STORE.owned])); }catch(e){} }
-function coinSync(){ document.querySelectorAll('.coinSum').forEach(e=>e.textContent=fmt(STORE.coins)+' coins'); const c=$('storeCoins'); if(c) c.textContent=fmt(STORE.coins); }
+function coinSync(){ document.querySelectorAll('.coinSum').forEach(e=>e.textContent=fmt(STORE.coins)+' coins'); const c=$('shopCoins'); if(c) c.textContent=fmt(STORE.coins); }
 function coinEarn(runMode){ let n=Math.floor(stats.score/150)+Math.floor(elapsed/10);
   if(runMode==='career' && FIN.done) n+= CAR.node&&CAR.node.boss ? 120 : 40;
-  if(runMode==='everest' && FIN.done) n+=200;
+  if(EV.on && FIN.done) n+=200;
   if(runMode==='avalanche' && FIN.done) n+=40;
   if(runMode==='daily' && elapsed>=DAILY.time-0.05) n+=30;
   n=Math.max(0,Math.min(2000,n)); STORE.coins+=n; coinSave(); coinSync(); return n; }
-function storeBuy(it){ if(!it.cost || gearOk(it) || STORE.coins<it.cost) return;
-  STORE.coins-=it.cost; STORE.owned.add(it.kind+':'+it.name); coinSave(); coinSync(); it._ok=true;
-  if(it.kind==='outfit') pickPreset(OUTFITS.indexOf(it)); else if(it.kind==='skis'){ GEAR.ski=SKI_COLS.indexOf(it); GEAR.skiC=null; applyGear(); }
-  try{ sfxBank(); }catch(e){} renderStore(); }
-function renderStore(){ const box=$('storeList'); if(!box) return; box.textContent=''; coinSync();
-  const hex=c=>'#'+new THREE.Color(c).getHexString();
-  const sec=(title,list,swatch)=>{ const h=document.createElement('h3'); h.textContent=title; box.appendChild(h); const g=document.createElement('div'); g.className='gear'; box.appendChild(g);
-    list.filter(it=>it.cost).forEach(it=>{ const own=gearOk(it), d=document.createElement('div'); d.className='gi si'+(own?' owned':'');
-      const sw=document.createElement('span'); sw.className='sw'; swatch(sw,it); const n=document.createElement('b'); n.textContent=it.name; const sm=document.createElement('small'); sm.textContent=own?'Owned':fmt(it.cost)+' coins';
-      const b=document.createElement('button'); b.className='buy'; b.textContent=own?'Owned':STORE.coins>=it.cost?'Buy':'Need '+fmt(it.cost-STORE.coins)+' more'; b.disabled=own||STORE.coins<it.cost;
-      b.addEventListener('click',()=>storeBuy(it)); d.append(sw,n,sm,b); g.appendChild(d); }); };
-  sec('Outfits',OUTFITS,(sw,o)=>{ sw.style.background='linear-gradient(135deg,'+hex(o.jacket)+' 55%,'+hex(o.pants)+' 55%)'; });
-  sec('Ski colours',SKI_COLS,(sw,o)=>{ sw.style.background=hex(o.c); });
-}
-document.querySelectorAll('[data-sheet="sheetStore"]').forEach(b=>b.addEventListener('click',renderStore));
 coinSync();
+
+
+/* ---------- Item shop: cosmetics for coins (back bling, headwear, air trails, name tags plus outfits and skis), with a daily rotation ---------- */
+var SHOP_EXTRA, SHOP_READY=false, ACC=null;
+const BACKS=[{name:'None'},{name:'Daypack',cost:300,d:'A low-profile pack for lift laps. Fits a sandwich, mostly.'},{name:'Shovel Pack',cost:500,d:'A pack with an aluminium shovel strapped on the outside. Ready to dig.'},
+  {name:'Avy Pack',cost:600,d:'A big red avalanche pack with a pull handle. For the deep stuff.'},{name:'Mini Board',cost:900,d:'A tiny snowboard on your back. Two planks and one plank at the same time.'},
+  {name:'Ice Wings',cost:1500,d:'Glassy shards of glacier ice that fan out from your back. They catch the light.'}];
+const HATS=[{name:'None'},{name:'Pom Topper',cost:300,d:'A fat red and white pom-pom on top of your helmet.'},{name:'Helmet Cam',cost:500,d:'An action cam on the front of your helmet. Pics or it didn\'t happen.'},
+  {name:'Mohawk',cost:700,d:'A neon pink helmet mohawk. Not aerodynamic.'},{name:'Antlers',cost:900,d:'A pair of antlers. The locals will understand.'},{name:'Crown',cost:1500,d:'A gold crown with red gems for the king of the mountain.'}];
+const TRAILS=[{name:'None'},{name:'Powder',cost:250,c:[1,1,1],d:'Big white puffs follow you through the air.'},{name:'Ice',cost:500,c:[0.55,0.85,1],d:'A cold blue shimmer off your tails on every jump.'},
+  {name:'Red Smoke',cost:700,c:[1,0.2,0.2],d:'Thick red smoke behind you, like a flare.'},{name:'Rainbow',cost:1200,d:'Every colour, in order, all the way down.'},{name:'Gold Dust',cost:1500,c:[1,0.8,0.32],d:'A sparkly gold stream off your skis. Pure flex.'}];
+const TAGS=[{name:'Default'},{name:'Chrome',cost:400,d:'A shiny chrome name tag that other riders see above your head.'},{name:'Ice',cost:400,d:'A frosted, glowing blue name tag.'},
+  {name:'Neon',cost:800,d:'A pink neon sign with your name on it.'},{name:'Gold',cost:1500,d:'A solid gold name tag. Everyone will know.'}];
+const ACC_KINDS={back:BACKS,hat:HATS,trail:TRAILS,tag:TAGS};
+const KIND_LABEL={outfit:'Outfit',skis:'Skis',back:'Back bling',hat:'Headwear',trail:'Air trail',tag:'Name tag'};
+for(const k in ACC_KINDS) ACC_KINDS[k].forEach(i=>i.kind=k);
+SHOP_EXTRA=[...BACKS,...HATS,...TRAILS,...TAGS];
+SHOP_EXTRA.forEach(it=>it._ok=gearOk(it));
+(()=>{ let g={}; try{ g=JSON.parse(localStorage.getItem('op-gear')||'{}')||{}; }catch(e){}
+  for(const k in ACC_KINDS){ const i=g[k]|0; GEAR[k]= ACC_KINDS[k][i] && gearOk(ACC_KINDS[k][i]) ? i : 0; } })();
+function rarity(it){ const c=it.cost||0; return c>=1200?'legendary':c>=650?'epic':c>=400?'rare':'common'; }
+function tagCls(it){ return it.name.toLowerCase().replace(/[^a-z]/g,''); }
+function trailCss(it){ if(it.name==='Rainbow') return 'linear-gradient(90deg,#ff4d4d,#ffd84d,#5dff6a,#4dc3ff,#b04dff)';
+  const c=(it.c||[1,1,1]).map(v=>Math.round(v*255)).join(','); return 'radial-gradient(circle at 30% 50%,rgba('+c+',1) 0 18%,rgba('+c+',.55) 36%,rgba('+c+',0) 70%),#111'; }
+function accWorn(){ return ['back','hat','trail','tag'].map(k=>{ const it=ACC_KINDS[k][GEAR[k]]; return GEAR[k]>0 && it && gearOk(it) ? GEAR[k] : 0; }); }
+
+// measure the torso (back surface) and helmet in their own local space so the parts sit on any rider model
+function accDims(){
+  const meas=(node,skip)=>{ const b=new THREE.Box3(), t=new THREE.Box3();
+    for(const c of node.children){ if(!c.isMesh||!c.geometry||skip(c)) continue; if(!c.geometry.boundingBox) c.geometry.computeBoundingBox(); c.updateMatrix(); t.copy(c.geometry.boundingBox).applyMatrix4(c.matrix); b.union(t); }
+    if(b.isEmpty()) b.set(new THREE.Vector3(-0.15,-0.2,-0.1),new THREE.Vector3(0.15,0.3,0.1)); return b; };
+  return {torso:meas(R.torsoF,c=>c===STK.mesh||c.userData.fpHide), head:meas(R.head,()=>false)}; }
+function accMat(k,c,o){ const M=ACC.mats; return M[k]||(M[k]=new THREE.MeshStandardMaterial(Object.assign({color:L(c),roughness:0.62,metalness:0},o||{}))); }
+function accFill(g,kind,name,D){
+  const add=(geo,m,x,y,z,rx,ry,rz,sx,sy,sz)=>{ const o=new THREE.Mesh(geo,m); o.position.set(x,y,z); o.rotation.set(rx||0,ry||0,rz||0); if(sx) o.scale.set(sx,sy,sz); o.castShadow=true; g.add(o); return o; };
+  const box=(w,h,d,m,x,y,z,rx,ry,rz)=>add(new THREE.BoxGeometry(w,h,d),m,x,y,z,rx,ry,rz);
+  const UP=new THREE.Vector3(0,1,0);
+  const stick=(a,b,r0,r1,m)=>{ const d=new THREE.Vector3().subVectors(b,a), l=d.length(); const o=add(new THREE.CylinderGeometry(r1,r0,l,10),m,(a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2); o.quaternion.setFromUnitVectors(UP,d.normalize()); return o; };
+  const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+  if(kind==='back'){ const T=D.torso, bz=T.max.z, h=T.max.y-T.min.y, yc=T.min.y+h*0.56;
+    if(name==='Daypack'||name==='Shovel Pack'){ const m=accMat(name==='Daypack'?'dp':'sp',name==='Daypack'?0x2b2f36:0x3d4a3a), s=accMat('strap',0x111214);
+      box(0.27,0.34,0.1,m,0,yc,bz+0.045); box(0.27,0.07,0.115,s,0,yc+0.15,bz+0.05); box(0.2,0.12,0.025,m,0,yc-0.08,bz+0.105); box(0.2,0.012,0.03,s,0,yc-0.02,bz+0.108);
+      box(0.035,0.3,0.02,s,-0.1,yc+0.02,bz+0.004); box(0.035,0.3,0.02,s,0.1,yc+0.02,bz+0.004);
+      if(name==='Shovel Pack'){ const al=accMat('alu',0xc9ced6,{metalness:0.85,roughness:0.3}), bk=accMat('strap',0x111214);
+        box(0.2,0.24,0.012,al,0,yc-0.01,bz+0.128); box(0.2,0.025,0.03,bk,0,yc+0.06,bz+0.13); box(0.2,0.025,0.03,bk,0,yc-0.08,bz+0.13);
+        stick(V(0.07,yc+0.1,bz+0.13),V(0.07,yc+0.36,bz+0.12),0.012,0.012,al); box(0.07,0.025,0.025,bk,0.07,yc+0.37,bz+0.12); } }
+    else if(name==='Avy Pack'){ const m=accMat('avy',0xb8232a), s=accMat('strap',0x111214);
+      box(0.29,0.42,0.12,m,0,yc+0.02,bz+0.055); box(0.29,0.08,0.13,s,0,yc+0.2,bz+0.06); box(0.22,0.14,0.03,s,0,yc-0.1,bz+0.12);
+      box(0.012,0.32,0.012,s,0.1,yc+0.03,bz+0.118); box(0.035,0.3,0.02,s,-0.1,yc+0.02,bz+0.004); box(0.035,0.3,0.02,s,0.1,yc+0.02,bz+0.004);
+      stick(V(0.13,yc+0.2,bz+0.03),V(0.16,yc+0.3,bz+0.0),0.012,0.012,s); }
+    else if(name==='Mini Board'){ const sub=new THREE.Group(); g.add(sub); sub.position.set(0,yc,bz+0.035); sub.rotation.z=0.45;
+      const top=accMat('mbt',0x15171a), gr=accMat('mbg',0xff4fa3), bi=accMat('mbb',0xeeeeee);
+      const deck=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.5,0.02),top); sub.add(deck);
+      for(const s2 of [-1,1]){ const cap=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.02,20,1,false,s2>0?-Math.PI/2:Math.PI/2,Math.PI),top); cap.rotation.x=Math.PI/2; cap.position.y=s2*0.25; sub.add(cap);
+        const bd=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.045,0.04),bi); bd.position.set(0,s2*0.13,0.03); sub.add(bd); }
+      const st=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.08,0.003),gr); st.position.z=0.0115; sub.add(st);
+      const st2=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.025,0.003),gr); st2.position.set(0,0.2,0.0115); sub.add(st2);
+      sub.traverse(o=>{ if(o.isMesh) o.castShadow=true; }); }
+    else if(name==='Ice Wings'){ const m=accMat('ice',0xcfeeff,{emissive:new THREE.Color(0x2f86c7),emissiveIntensity:0.55,metalness:0.1,roughness:0.12,transparent:true,opacity:0.82});
+      const oct=new THREE.OctahedronGeometry(1,0);
+      for(const s2 of [-1,1]){ const bx=s2*0.05, by=yc+0.08, z=bz+0.05;
+        [[0.72,0.5],[1.08,0.42],[1.42,0.32],[1.75,0.22]].forEach(([a,len])=>{ const dx=s2*Math.sin(a), dy=Math.cos(a);
+          add(oct,m,bx+dx*len*0.5,by+dy*len*0.5,z+0.02,0,0,-s2*a,0.035,len*0.5,0.012); }); }
+      add(new THREE.OctahedronGeometry(0.045,0),m,0,yc+0.08,bz+0.06); } }
+  else if(kind==='hat'){ const H=D.head, top=H.max.y, cx=(H.min.x+H.max.x)/2, cz=(H.min.z+H.max.z)/2, rx=(H.max.x-H.min.x)/2, rz=(H.max.z-H.min.z)/2, ry=Math.min(rx,rz), yc=top-ry;
+    if(name==='Pom Topper'){ const w=accMat('pomw',0xf1f1f1,{roughness:1}), r=accMat('pomr',0xb8232a,{roughness:1});
+      add(new THREE.CylinderGeometry(0.035,0.045,0.035,14),r,cx,top+0.004,cz); add(new THREE.SphereGeometry(0.068,16,12),w,cx,top+0.07,cz,0,0,0,1,0.92,1);
+      add(new THREE.SphereGeometry(0.03,10,8),r,cx+0.04,top+0.1,cz-0.02); }
+    else if(name==='Helmet Cam'){ const k=accMat('cam',0x141518,{roughness:0.4}), gl=accMat('lens',0x6fa8ff,{metalness:0.6,roughness:0.1}), gy=accMat('camg',0x444a52);
+      const zf=cz-rz*0.5, y=yc+ry*0.88; box(0.06,0.014,0.06,gy,cx,y-0.004,zf+0.02,0.5); box(0.068,0.062,0.095,k,cx,y+0.036,zf);
+      add(new THREE.CylinderGeometry(0.024,0.024,0.018,16),gl,cx,y+0.036,zf-0.055,Math.PI/2); box(0.02,0.006,0.012,accMat('rec',0xff3030,{emissive:new THREE.Color(0xff2020),emissiveIntensity:1}),cx+0.016,y+0.07,zf+0.02); }
+    else if(name==='Mohawk'){ const m=accMat('mohawk',0xff3fa4,{roughness:0.8});
+      for(let i=0;i<8;i++){ const t=i/7, a=-1.15+2.3*t, hgt=0.07+0.06*Math.sin(Math.PI*t);
+        const o=add(new THREE.ConeGeometry(0.035,hgt,4),m,cx,yc+Math.cos(a)*(ry+hgt*0.38),cz+Math.sin(a)*(rz*0.98+hgt*0.38),a,0,0); o.scale.set(0.45,1,1.1); } }
+    else if(name==='Antlers'){ const m=accMat('antler',0x6b4a2e,{roughness:0.85}), tip=accMat('antlert',0xe9e0cf,{roughness:0.7});
+      for(const s2 of [-1,1]){ const p0=V(cx+s2*rx*0.5,yc+ry*0.78,cz+0.01), p1=V(p0.x+s2*0.09,p0.y+0.14,p0.z+0.02), p2=V(p1.x+s2*0.09,p1.y+0.09,p1.z+0.05);
+        stick(p0,p1,0.018,0.014,m); stick(p1,p2,0.014,0.008,m);
+        const q=p0.clone().lerp(p1,0.55); const t1=V(q.x+s2*0.01,q.y+0.09,q.z-0.06); stick(q,t1,0.011,0.006,m);
+        const t2=V(p1.x+s2*0.005,p1.y+0.1,p1.z-0.05); stick(p1,t2,0.011,0.006,m);
+        for(const e of [p2,t1,t2]) add(new THREE.SphereGeometry(0.008,8,6),tip,e.x,e.y,e.z); } }
+    else if(name==='Crown'){ const gd=accMat('gold',0xe6b947,{metalness:0.95,roughness:0.25,side:THREE.DoubleSide}), gem=accMat('gem',0xd0142a,{metalness:0.2,roughness:0.15,emissive:new THREE.Color(0x400008)});
+      const sub=new THREE.Group(); g.add(sub); sub.position.set(cx,top-0.025,cz); sub.rotation.z=0.14; const rr=Math.max(0.055,rx*0.62);
+      sub.add(new THREE.Mesh(new THREE.CylinderGeometry(rr*1.04,rr,0.055,24,1,true),gd));
+      for(let i=0;i<8;i++){ const a=i/8*Math.PI*2; const c=new THREE.Mesh(new THREE.ConeGeometry(0.018,0.06,4),gd); c.position.set(Math.cos(a)*rr*1.03,0.055,Math.sin(a)*rr*1.03); sub.add(c);
+        const b=new THREE.Mesh(new THREE.SphereGeometry(0.009,8,6),i%2?gd:gem); b.position.set(Math.cos(a)*rr*1.03,0.09,Math.sin(a)*rr*1.03); sub.add(b);
+        if(i%2===0){ const j=new THREE.Mesh(new THREE.SphereGeometry(0.011,8,6),gem); j.position.set(Math.cos(a)*rr*1.06,0.0,Math.sin(a)*rr*1.06); sub.add(j); } }
+      sub.traverse(o=>{ if(o.isMesh) o.castShadow=true; }); } }
+}
+function accClear(g){ while(g.children.length){ const c=g.children.pop(); c.traverse(o=>{ if(o.geometry) o.geometry.dispose(); }); } }
+function accGroup(){ const g=new THREE.Group(); g.matrixAutoUpdate=false; scene.add(g); return g; }
+// worn parts live in the scene and copy the torso/head transform every frame: they never sit inside the rider's node tree, so pose and cloth indices stay the same
+function applyAcc(){ if(!ACC) ACC={back:accGroup(),hat:accGroup(),mats:{}}; ACC.dims=accDims();
+  for(const k of ['back','hat']){ const g=ACC[k]; accClear(g); const it=ACC_KINDS[k][GEAR[k]]; if(GEAR[k]>0 && it && gearOk(it)) accFill(g,k,it.name,ACC.dims); } }
+function accSync(){ if(!ACC) return;
+  const put=(g,node,vis)=>{ if(!g) return; g.visible=vis && g.children.length>0; if(!g.visible) return; node.updateWorldMatrix(true,false); g.matrix.copy(node.matrixWorld); g.matrixWorldNeedsUpdate=true; };
+  const fp=CAM.fp && state!=='title';
+  put(ACC.back,R.torsoF,R.rider.visible && !fp); put(ACC.hat,R.head,R.rider.visible && !fp);
+  if(NET.peers && NET.peers.size){ const it=poseNodes.indexOf(R.torsoF), ih=poseNodes.indexOf(R.head);
+    for(const r of NET.peers.values()){ put(r.accB,r.nodes[it],r.g.visible); put(r.accH,r.nodes[ih],r.g.visible); } } }
+function accRemote(r,v){ if(!ACC) applyAcc();
+  for(const [k,f,i] of [['back','accB',0],['hat','accH',1]]){ if(r[f]){ accClear(r[f]); scene.remove(r[f]); r[f]=null; }
+    if(v[i]>0){ r[f]=accGroup(); accFill(r[f],k,ACC_KINDS[k][v[i]].name,ACC.dims); } }
+  r.trail=v[2]; for(const c of [...r.tag.classList]) if(c.startsWith('tg-')) r.tag.classList.remove(c);
+  if(v[3]>0) r.tag.classList.add('tg-'+tagCls(TAGS[v[3]])); }
+
+// air trails: coloured puffs off your ski tails while you're in the air (other riders' trails too)
+const trailC=[1,1,1]; let trAcc=0, trHue=0;
+function trailColor(it,out){ if(it.name==='Rainbow'){ trHue=(trHue+0.013)%1; const c=new THREE.Color().setHSL(trHue,0.95,0.6); out[0]=c.r; out[1]=c.g; out[2]=c.b; }
+  else { const c=it.c||[1,1,1], j=it.name==='Gold Dust'?rand(0.75,1.15):1; out[0]=Math.min(1,c[0]*j); out[1]=Math.min(1,c[1]*j); out[2]=Math.min(1,c[2]*j); } return out; }
+function trailPuff(it,x,y,z,vx,vz){ const gd=it.name==='Gold Dust', sm=it.name==='Red Smoke', pw=it.name==='Powder';
+  emit(x+rand(-0.15,0.15),y+rand(-0.1,0.15),z+rand(-0.15,0.15), -vx*0.08+rand(-0.4,0.4), rand(-0.2,0.5), -vz*0.08+rand(-0.4,0.4),
+    gd?rand(0.12,0.22):sm?rand(0.9,1.5):pw?rand(0.7,1.2):rand(0.35,0.6), gd?rand(0.5,0.9):sm?rand(1.2,1.8):rand(0.7,1.1), trailColor(it,trailC)); }
+function trailTick(dt){ if(!dt) return; trAcc+=dt; if(trAcc<1/45) return; const step=trAcc; trAcc=0;
+  if(state==='play' && P.air && GEAR.trail>0){ const it=TRAILS[GEAR.trail]; if(it && gearOk(it) && P.y-groundH(P.x,P.z)>0.6){ const n=it.name==='Gold Dust'?3:2; for(let i=0;i<n;i++) trailPuff(it,P.x,P.y+0.15,P.z,P.vx,P.vz); } }
+  if(NET.peers && NET.peers.size) for(const r of NET.peers.values()){ if(!r.trail || !r.g.visible) continue; const it=TRAILS[r.trail], gp=r.g.position;
+    if(it && gp.y-groundH(gp.x,gp.z)>1.0){ const lp=r.trP||(r.trP=gp.clone()), vx=(gp.x-lp.x)/step, vz=(gp.z-lp.z)/step; trailPuff(it,gp.x,gp.y+0.15,gp.z,vx,vz); }
+    (r.trP||(r.trP=gp.clone())).copy(gp); } }
+
+// shop art: the rider wearing the item, rendered off-screen once and cached
+const PV={}; const PVW=360, PVH=450;
+// a relaxed cruising stance (captured from the rig) so shop renders don't use whatever pose the menu rider is in
+const PV_POSE=[0,0,0,-0.119,0,0,0.993,0,-0.7,0,0,0,0,1,0,0,0,0,0,0,1,-0.14,0,0,0,0,0,1,0.14,0,0,0,0,0,1,-0.09,0.91,0.07,-0.873,0,0.312,0.374,0.1,0.91,0.07,-0.873,0,-0.312,0.374,-0.2,0.58,-0.23,0.922,0,-0.217,0.322,0.2,0.58,-0.23,0.922,0,0.217,0.322,0,0.98,0.07,-0.13,0,0,0.992,0,0.63,0,0.041,0,0,0.999,-0.2,1.4,-0.04,0.679,0,0.685,0.264,-0.31,1.14,0.07,-0.896,0,-0.195,0.399,-0.28,0.98,-0.11,-0.896,0,-0.195,0.399,-0.27,0.95,-0.13,-0.896,0,-0.195,0.399,-0.26,0.92,-0.17,0.909,0,0.177,0.378,0.21,1.4,-0.04,0.679,0,-0.685,0.264,0.31,1.14,0.07,-0.896,0,0.195,0.399,0.28,0.98,-0.11,-0.896,0,0.195,0.399,0.27,0.95,-0.13,-0.896,0,0.195,0.399,0.26,0.92,-0.17,0.909,0,-0.177,0.378];
+function pvInit(){ if(PV.scene) return; PV.scene=new THREE.Scene(); PV.cam=new THREE.PerspectiveCamera(28,PVW/PVH,0.05,60);
+  PV.scene.add(new THREE.HemisphereLight(0xffffff,0x2c323c,0.7)); const d=new THREE.DirectionalLight(0xffffff,1.35); d.position.set(-2,4,-3); PV.scene.add(d);
+  const d2=new THREE.DirectionalLight(0xcfe2ff,0.6); d2.position.set(3,2,4); PV.scene.add(d2);
+  PV.rt=new THREE.WebGLRenderTarget(PVW,PVH); PV.rt.texture.encoding=THREE.sRGBEncoding; PV.buf=new Uint8Array(PVW*PVH*4);
+  PV.cv=document.createElement('canvas'); PV.cv.width=PVW; PV.cv.height=PVH; PV.cache=new Map(); }
+function pvRider(){ if(PV.g) return; setFPVis(false); const g=R.rider.clone(true), list=[]; g.traverse(o=>list.push(o)); setFPVis(CAM.fp && state!=='title');
+  const mats={}; for(const k in R.SLOTS) mats[k]=R.SLOTS[k].clone(); const swap=m=>{ for(const k in R.SLOTS) if(m===R.SLOTS[k]) return mats[k]; return m; };
+  g.traverse(o=>{ if(o.isMesh){ o.material=Array.isArray(o.material)?o.material.map(swap):swap(o.material); o.castShadow=false; } });
+  g.position.set(0,0,0); g.rotation.set(0,0,0); g.visible=true; PV.scene.add(g); PV.g=g; PV.mats=mats;
+  const nodes=poseIdx.map(i=>list[i]); PV.torso=nodes[poseNodes.indexOf(R.torsoF)]; PV.head=nodes[poseNodes.indexOf(R.head)];
+  if(PV_POSE.length===nodes.length*7) nodes.forEach((n,i)=>{ const o=i*7, k=PV_POSE; n.position.set(k[o],k[o+1],k[o+2]); n.quaternion.set(k[o+3],k[o+4],k[o+5],k[o+6]); });
+  PV.cloth=CLOTH_IDX.length?clothBind(g,true):null;
+  PV.ab=new THREE.Group(); PV.ah=new THREE.Group(); PV.torso.add(PV.ab); PV.head.add(PV.ah); }
+function pvKey(it){ return it.kind+':'+it.name+':'+LOOK.join(',')+':'+GEAR.ski+':'+GEAR.skiC+':'+BOARD; }
+function pvShot(it){ pvInit(); const key=pvKey(it); if(PV.cache.has(key)) return PV.cache.get(key);
+  if(!ACC) applyAcc(); pvRider(); rideVis(PV.g,BOARD);
+  paintLook(PV.mats,LOOK); paintSki(PV.mats,GEAR.ski,GEAR.skiC,GEAR.poleC); accClear(PV.ab); accClear(PV.ah);
+  let view='body';
+  if(it.kind==='outfit') paintOutfit(PV.mats,OUTFITS.indexOf(it));
+  else if(it.kind==='skis'){ paintSki(PV.mats,SKI_COLS.indexOf(it),null,GEAR.poleC); view='skis'; }
+  else if(it.kind==='back'){ accFill(PV.ab,'back',it.name,ACC.dims); view='back'; }
+  else if(it.kind==='hat'){ accFill(PV.ah,'hat',it.name,ACC.dims); view='head'; }
+  else if(it.kind==='trail') view='trail';
+  PV.g.updateMatrixWorld(true); if(PV.cloth) bendAll(PV.cloth);
+  const tp=new THREE.Vector3(), hp=new THREE.Vector3(); PV.torso.getWorldPosition(tp); PV.head.getWorldPosition(hp);
+  const fw=new THREE.Vector3(0,0,-1).transformDirection(PV.torso.matrixWorld); fw.y=0; if(fw.lengthSq()<1e-4) fw.set(0,0,-1); fw.normalize();
+  const bb=new THREE.Box3(); PV.g.traverse(o=>{ if(o.isMesh && o.visible && o.parent!==PV.ab && o.parent!==PV.ah && o.name!=='pole') bb.expandByObject(o); }); const bc=bb.getCenter(new THREE.Vector3()), bh=bb.max.y-bb.min.y;
+  const fit=(h)=>h*0.5/Math.tan(PV.cam.fov*Math.PI/360)*1.22;
+  const orbit=(ang,el,dist,tgt)=>{ const d=fw.clone().applyAxisAngle(new THREE.Vector3(0,1,0),ang); PV.cam.position.copy(tgt).addScaledVector(d,dist*Math.cos(el)); PV.cam.position.y+=dist*Math.sin(el); PV.cam.lookAt(tgt); };
+  if(view==='back') orbit(Math.PI+0.8,0.16,fit(1.45),tp.clone().add(new THREE.Vector3(0,0.18,0)));
+  else if(view==='head') orbit(0.62,0.2,fit(0.66),hp.clone().add(new THREE.Vector3(0,0.13,0)));
+  else if(view==='skis') orbit(0.85,0.38,fit(bh*1.05),bc.clone().add(new THREE.Vector3(0,-bh*0.12,0)));
+  else if(view==='trail') orbit(Math.PI+0.7,0.12,fit(bh*1.25),bc.clone().add(new THREE.Vector3(0,bh*0.12,0)));
+  else orbit(0.6,0.12,fit(bh),bc);
+  PV.scene.environment=scene.environment||null;
+  const oc=renderer.getClearColor(new THREE.Color()), oa=renderer.getClearAlpha(), ort=renderer.getRenderTarget(), ex=renderer.toneMappingExposure;
+  renderer.toneMappingExposure=1.05; renderer.setRenderTarget(PV.rt); renderer.setClearColor(0x000000,0); renderer.clear(); renderer.render(PV.scene,PV.cam);
+  renderer.readRenderTargetPixels(PV.rt,0,0,PVW,PVH,PV.buf); renderer.setRenderTarget(ort); renderer.setClearColor(oc,oa); renderer.toneMappingExposure=ex;
+  const x=PV.cv.getContext('2d'), img=x.createImageData(PVW,PVH); for(let y=0;y<PVH;y++) img.data.set(PV.buf.subarray((PVH-1-y)*PVW*4,(PVH-y)*PVW*4),y*PVW*4);
+  x.clearRect(0,0,PVW,PVH); x.putImageData(img,0,0);
+  if(view==='trail'){ x.save(); x.globalCompositeOperation='destination-over'; const c=[1,1,1];
+    for(let i=0;i<70;i++){ const t=i/69, px=PVW*0.5-150*t+Math.sin(t*5)*10, py=PVH*0.72-120*t*t+80*t, r=(it.name==='Gold Dust'?3+4*Math.random():it.name==='Red Smoke'?18+14*t:9+10*t)*(1-t*0.35);
+      if(it.name==='Rainbow'){ const cc=new THREE.Color().setHSL(t*0.9,0.95,0.6); c[0]=cc.r; c[1]=cc.g; c[2]=cc.b; } else trailColor(it,c);
+      const gr=x.createRadialGradient(px,py,0,px,py,r); const rgb=c.map(v=>Math.round(Math.min(1,v)*255)).join(',');
+      gr.addColorStop(0,'rgba('+rgb+','+(0.85*(1-t*0.6))+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); x.fillStyle=gr; x.beginPath(); x.arc(px+(Math.random()-0.5)*8,py+(Math.random()-0.5)*8,r,0,Math.PI*2); x.fill(); }
+    x.restore(); }
+  const url=PV.cv.toDataURL('image/png'); PV.cache.set(key,url); return url; }
+
+// the shop page
+const SHOP={sel:null,q:[],qRun:false,timer:0,day:0};
+function shopDay(){ const d=new Date(); return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(); }
+function shopRng(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
+function shopAll(){ return [...OUTFITS,...SKI_COLS,...SHOP_EXTRA].filter(it=>it.cost); }
+function shopToday(){ const rnd=shopRng(shopDay()*7919+13), pool=shopAll();
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const feat=pool.filter(it=>rarity(it)==='legendary'||rarity(it)==='epic').slice(0,2); const daily=pool.filter(it=>!feat.includes(it)).slice(0,6); return {feat,daily}; }
+function itemIdx(it){ return it.kind==='outfit'?OUTFITS.indexOf(it):it.kind==='skis'?SKI_COLS.indexOf(it):ACC_KINDS[it.kind].indexOf(it); }
+function isWorn(it){ const i=itemIdx(it); if(it.kind==='outfit') return OUTFIT.i===i; if(it.kind==='skis') return GEAR.ski===i && GEAR.skiC==null; return GEAR[it.kind]===i; }
+function wearItem(it,toggle){ const i=itemIdx(it); if(!gearOk(it)) return;
+  if(it.kind==='outfit') pickPreset(i);
+  else if(it.kind==='skis'){ GEAR.ski=i; GEAR.skiC=null; applyGear(); }
+  else { GEAR[it.kind]= toggle && GEAR[it.kind]===i ? 0 : i; applyGear(); } }
+function storeBuy(it){ if(!it.cost || gearOk(it) || STORE.coins<it.cost) return false;
+  STORE.coins-=it.cost; STORE.owned.add(it.kind+':'+it.name); coinSave(); coinSync(); it._ok=true; wearItem(it); try{ sfxBank(); }catch(e){} return true; }
+function shopArt(box,it,now){ box.textContent='';
+  if(it.kind==='tag'){ const t=document.createElement('div'); t.className='nettag tagDemo tg-'+tagCls(it); const n=document.createElement('span'), sm=document.createElement('small'); n.textContent='Your name'; sm.textContent='24 m ahead · 3,120 pts'; t.append(n,sm); box.appendChild(t); return; }
+  const im=new Image(); im.alt=''; im.decoding='async'; box.appendChild(im);
+  const key=pvKey(it); if(now || (PV.cache && PV.cache.has(key))) im.src=pvShot(it); else { SHOP.q.push([im,it]); shopPump(); } }
+function shopPump(){ if(SHOP.qRun) return; SHOP.qRun=true;
+  const go=()=>{ const t0=performance.now(); while(SHOP.q.length && performance.now()-t0<14){ const [im,it]=SHOP.q.shift(); if(im.isConnected) im.src=pvShot(it); }
+    if(SHOP.q.length) requestAnimationFrame(go); else SHOP.qRun=false; };
+  requestAnimationFrame(go); }
+function shopTile(it,big){ const b=document.createElement('button'), own=gearOk(it), worn=own&&isWorn(it);
+  b.className='stile r-'+rarity(it)+(big?' big':'')+(own?' own':''); b.setAttribute('aria-label',it.name+', '+KIND_LABEL[it.kind]+', '+(own?'owned':fmt(it.cost)+' coins'));
+  const art=document.createElement('div'); art.className='sArt'; shopArt(art,it);
+  const meta=document.createElement('div'); meta.className='sMeta'; const n=document.createElement('b'); n.textContent=it.name; const k=document.createElement('small'); k.textContent=KIND_LABEL[it.kind];
+  const pr=document.createElement('div'); pr.className='sPrice'; if(own) pr.textContent=worn?'Equipped':'Owned'; else { const c=document.createElement('i'); c.className='coin'; pr.append(c,document.createTextNode(fmt(it.cost))); }
+  meta.append(n,k,pr); b.append(art,meta);
+  if(own){ const bd=document.createElement('span'); bd.className='sBadge'; bd.textContent='✓ Owned'; b.appendChild(bd); }
+  else if(SHOP_EXTRA.includes(it)){ const nw=document.createElement('span'); nw.className='sNew'; nw.textContent='New'; b.appendChild(nw); }
+  b.addEventListener('click',()=>shopDetail(it)); return b; }
+function renderShop(){ const box=$('shopBody'); if(!box) return; box.textContent=''; SHOP.q.length=0; coinSync(); SHOP.day=shopDay();
+  const sec=(title,sub,items,cls,big)=>{ if(!items.length) return; const s=document.createElement('section'); s.className='shopSec'; const h=document.createElement('h2'); h.textContent=title;
+    if(sub){ const sm=document.createElement('small'); sm.textContent=sub; h.appendChild(sm); } const g=document.createElement('div'); g.className='shopGrid'+(cls?' '+cls:'');
+    items.forEach(it=>g.appendChild(shopTile(it,big))); s.append(h,g); box.appendChild(s); };
+  const T=shopToday(); sec('Featured','Today only',T.feat,'feat',true); sec('Daily','Today only',T.daily);
+  const byR=l=>l.filter(it=>it.cost).sort((a,b)=>a.cost-b.cost);
+  sec('Back bling','',byR(BACKS)); sec('Headwear','',byR(HATS)); sec('Air trails','Shows when you\'re in the air',byR(TRAILS)); sec('Name tags','Other riders see it',byR(TAGS));
+  sec('Outfits','',byR(OUTFITS)); sec('Skis','',byR(SKI_COLS));
+  shopClock(); }
+function shopClock(){ const el=$('shopTimer'); if(!el) return; const n=new Date(), m=new Date(n); m.setHours(24,0,0,0); let s=Math.max(0,Math.round((m-n)/1000));
+  const h=Math.floor(s/3600), mi=Math.floor(s%3600/60), se=s%60; el.textContent='New items in '+h+'h '+String(mi).padStart(2,'0')+'m '+String(se).padStart(2,'0')+'s';
+  if(SHOP.day && shopDay()!==SHOP.day) renderShop(); }
+function shopDetail(it){ SHOP.sel=it; const m=$('shopModal'), card=m.querySelector('.smCard'); card.classList.remove('bought');
+  const r=rarity(it); card.className='smCard r-'+r; shopArt($('smArt'),it,true);
+  $('smRar').textContent=r; $('smName').textContent=it.name; $('smKind').textContent=KIND_LABEL[it.kind];
+  $('smDesc').textContent=it.d || (it.kind==='outfit'?'A full fit: jacket, pants, helmet, goggles and gloves. Change any part later in Fit.':'Ski topsheet colour. Shows on your skis and in your tracks.');
+  shopDetailBtns(); m.hidden=false; $('smBuy').focus(); }
+function shopDetailBtns(){ const it=SHOP.sel; if(!it) return; const own=gearOk(it), worn=own&&isWorn(it), b=$('smBuy'), pr=$('smPrice');
+  pr.textContent=''; if(!own){ const c=document.createElement('i'); c.className='coin'; pr.append(c,document.createTextNode(fmt(it.cost))); } else pr.textContent='Owned';
+  b.classList.toggle('eq',own&&worn); b.disabled=false;
+  if(!own){ const need=it.cost-STORE.coins; b.textContent=need>0?'Need '+fmt(need)+' more':'Buy'; b.disabled=need>0; }
+  else b.textContent = worn ? (it.kind==='outfit'||it.kind==='skis' ? 'Equipped' : 'Unequip') : 'Equip';
+  if(own && worn && (it.kind==='outfit'||it.kind==='skis')) b.disabled=true; }
+function shopClose(){ $('shopModal').hidden=true; SHOP.sel=null; }
+$('smBuy').addEventListener('click',()=>{ const it=SHOP.sel; if(!it) return;
+  if(!gearOk(it)){ if(storeBuy(it)){ const c=$('shopModal').querySelector('.smCard'); c.classList.remove('bought'); void c.offsetWidth; c.classList.add('bought'); } }
+  else wearItem(it,true);
+  shopDetailBtns(); const y=$('shopBody').scrollTop; renderShop(); $('shopBody').scrollTop=y; });
+$('smClose').addEventListener('click',shopClose);
+$('shopModal').addEventListener('click',e=>{ if(e.target===e.currentTarget) shopClose(); });
+function pvReset(){ if(PV.g){ PV.scene.remove(PV.g); for(const k in PV.mats) PV.mats[k].dispose(); PV.g=null; } if(PV.cache) PV.cache.clear(); }
+function shopOpen(){ closeSheet(true); pvReset(); show('shop'); renderShop(); $('shopBody').scrollTop=0; clearInterval(SHOP.timer); SHOP.timer=setInterval(shopClock,1000); $('shopBack').focus(); }
+function shopExit(){ shopClose(); clearInterval(SHOP.timer); show('title'); const b=$('shopBtn'); if(b) b.focus(); }
+$('shopBtn').addEventListener('click',shopOpen);
+$('shopBack').addEventListener('click',shopExit);
+window.addEventListener('keydown',e=>{ if(e.key!=='Escape' || $('shop').hidden) return; e.preventDefault(); e.stopImmediatePropagation(); if(!$('shopModal').hidden) shopClose(); else shopExit(); },true);
+SHOP_READY=true; applyAcc();
 
 /* ---------- Leaderboard (daily) ---------- */
 const LBV={list:[],watching:false};
@@ -3444,6 +3817,12 @@ function renderLocker(){ const box=$('lockerList'); if(!box) return; box.textCon
   sec('Outfits',OUTFITS,OUTFIT.i,(sw,o)=>{ sw.style.background='linear-gradient(135deg,'+hex(o.jacket)+' 55%,'+hex(o.pants)+' 55%)'; },i=>{ pickPreset(i); });
   sec('Ski colours',SKI_COLS,GEAR.ski,(sw,o)=>{ sw.style.background=hex(o.c); },i=>{ GEAR.ski=i; GEAR.skiC=null; applyGear(); });
   sec('Stickers',STICKERS,GEAR.sticker,(sw,o)=>{ if(o.name!=='None'){ const c=stickerCanvas(o.name,64); sw.style.background='center/80% no-repeat url('+c.toDataURL()+'), var(--panel2)'; } },i=>{ GEAR.sticker=i; applyGear(); });
+  const accSw=(sw,o)=>{ if(!o.cost) return; if(o.kind==='trail'){ sw.style.background=trailCss(o); return; } if(o.kind==='tag'){ sw.className='sw nettag tagDemo tg-'+tagCls(o); sw.textContent='Name'; sw.style.fontSize='12px'; return; }
+    sw.classList.add('pv'); sw.style.backgroundImage='url('+pvShot(o)+')'; sw.style.height='64px'; };
+  sec('Back bling',BACKS,GEAR.back,accSw,i=>{ GEAR.back=i; applyGear(); });
+  sec('Headwear',HATS,GEAR.hat,accSw,i=>{ GEAR.hat=i; applyGear(); });
+  sec('Air trails',TRAILS,GEAR.trail,accSw,i=>{ GEAR.trail=i; applyGear(); });
+  sec('Name tags',TAGS,GEAR.tag,accSw,i=>{ GEAR.tag=i; applyGear(); });
 }
 $('raceBtn').addEventListener('click',()=>{ if(!NET.room) return; closeSheet(); raceStart(); });
 $('riJoin').addEventListener('click',()=>raceJoin(RACE.invite));
@@ -3818,6 +4197,7 @@ function frame(now){
   updatePowder(paused?0:rdt); updateParticles(paused?0:rdt*timeScale); updateFlakes(paused?0:rdt);
   updateRider(paused?0:rdt,now); if(state==='photo') photoCam(rdt); else updateCamera(paused?0:rdt,now); updateStreaks(paused?0:rdt); treeViewCheck(); updateEnvironment();
   netTick(rdt,now); gfxWatch(Math.max(rdt,0.001));
+  if(SHOP_READY) accSync();
   renderer.render(scene,camera);
 }
 /* ---------- Live multiplayer ----------
@@ -3920,7 +4300,8 @@ indexPose();
 const r3=v=>Math.round(v*1000)/1000;
 function packPose(){
   const rp=R.rider.position, a=[r3(rp.x),r3(rp.y),r3(rp.z),R.rider.visible?1:0];
-  for(const n of poseNodes){ const q=n.quaternion, ps=n.position; a.push(r3(ps.x),r3(ps.y),r3(ps.z),r3(q.x),r3(q.y),r3(q.z),r3(q.w)); }
+  const r2=v=>Math.round(v*100)/100;
+  for(const n of poseNodes){ const q=n.quaternion, ps=n.position; a.push(r2(ps.x),r2(ps.y),r2(ps.z),r3(q.x),r3(q.y),r3(q.z),r3(q.w)); }
   return a;
 }
 function peerColor(peer){ let h=0; for(let i=0;i<peer.length;i++) h=(h*31+peer.charCodeAt(i))|0; return NET_COLORS[Math.abs(h)%NET_COLORS.length]; }
@@ -3935,9 +4316,9 @@ function makeRemote(peer){
   g.visible=false; scene.add(g);
   const tag=document.createElement('div'); tag.className='nettag'; tag.hidden=true;
   const nm=document.createElement('span'), sc=document.createElement('small'); tag.append(nm,sc); tagLayer.appendChild(tag);
-  return {peer,g,nodes:poseIdx.map(i=>list[i]),cloth:clothBind(g,true),jm,mats,outfit:-1,col,buf:[],lastK:null,score:0,by:null,tag,nm,sc,seen:0};
+  return {peer,g,nodes:poseIdx.map(i=>list[i]),cloth:clothBind(g,true),jm,mats,outfit:-1,col,buf:[],lastK:null,score:0,by:null,tag,nm,sc,seen:0,off:null,jit:60,lastRecv:0,sp:null};
 }
-function dropRemote(peer){ const r=NET.peers.get(peer); if(!r) return; scene.remove(r.g); for(const k in r.mats) r.mats[k].dispose(); r.tag.remove(); NET.peers.delete(peer); }
+function dropRemote(peer){ const r=NET.peers.get(peer); if(!r) return; scene.remove(r.g); if(r.accB) scene.remove(r.accB); if(r.accH) scene.remove(r.accH); for(const k in r.mats) r.mats[k].dispose(); r.tag.remove(); NET.peers.delete(peer); }
 function validPose(k){ if(!Array.isArray(k)||k.length!==POSE_LEN) return false; for(let i=0;i<k.length;i++){ const v=k[i]; if(typeof v!=='number'||!isFinite(v)||Math.abs(v)>1e6) return false; } return true; }
 function nameFor(r){ return (r.admin?'★ ':'')+(r.name || 'Rider'); }
 const cleanName=v=>String(v||'').replace(/[^\p{L}\p{N} _.'-]/gu,'').trim().slice(0,16);
@@ -3954,19 +4335,34 @@ function ingest(p){
   modeIngest(r,pres);
   if(pres.k!==r.lastK && validPose(pres.k)){
     r.lastK=pres.k; const now=performance.now();
+    const st=Number.isFinite(pres.t)?pres.t:null, v=Array.isArray(pres.v)&&pres.v.length===3&&pres.v.every(x=>Number.isFinite(x)&&Math.abs(x)<200)?pres.v:null;
+    // clock offset: the fastest an update has ever got here is the baseline; anything slower is relay jitter
+    let t=now;
+    if(st!=null){ const d=now-st;
+      if(r.off==null || Math.abs(d-r.off)>4000){ r.off=d; r.buf.length=0; }                 // first update, or the sender's clock jumped (tab slept)
+      else if(d<r.off){ const sh=r.off-d; for(const e of r.buf) e.t-=sh; r.off=d; }        // a faster path: slide the buffer back, keep playing
+      r.off+= (now-(r.lastRecv||now))*0.0004;                                              // let the baseline creep up slowly so clock drift can't stall playback
+      const j=Math.max(0,d-r.off); r.jit=Math.max(j,r.jit*0.985); t=st+r.off; }
+    r.lastRecv=now;
     const last=r.buf[r.buf.length-1];
-    if(last && Math.hypot(pres.k[0]-last.k[0],pres.k[1]-last.k[1],pres.k[2]-last.k[2])>8) r.buf.length=0; // respawn: snap, don't slide
-    r.buf.push({t:now,k:pres.k}); if(r.buf.length>12) r.buf.shift(); r.seen=now;
+    if(last && Math.hypot(pres.k[0]-last.k[0],pres.k[1]-last.k[1],pres.k[2]-last.k[2])>8){ r.buf.length=0; r.sp=null; } // respawn: snap, don't slide
+    if(last && t<=last.t) return;   // out of order: older than what we already have
+    r.buf.push({t,k:pres.k,v}); if(r.buf.length>30) r.buf.shift(); r.seen=now;
   }
 }
 const qa=new THREE.Quaternion(), qb=new THREE.Quaternion(), tagV=new THREE.Vector3();
 function applyRemote(r,now){
   const b=r.buf; if(!b.length || now-r.seen>5000){ r.g.visible=false; r.tag.hidden=true; return; }
-  const rt=now-170; let A=b[0], B=b[0], f=0;
-  if(rt>=b[b.length-1].t){ A=B=b[b.length-1]; }
-  else for(let i=0;i<b.length-1;i++){ if(b[i].t<=rt && rt<b[i+1].t){ A=b[i]; B=b[i+1]; f=(rt-A.t)/(B.t-A.t); break; } }
+  const delay=clamp(r.jit+45,90,450), rt=now-delay; let A=b[0], B=b[0], f=0, ext=0;
+  if(rt>=b[b.length-1].t){ A=B=b[b.length-1]; ext=Math.min(0.3,(rt-A.t)/1000); }
+  else if(rt<b[0].t){ A=B=b[0]; }
+  else for(let i=0;i<b.length-1;i++){ if(b[i].t<=rt && rt<b[i+1].t){ A=b[i]; B=b[i+1]; f=(rt-A.t)/Math.max(1,B.t-A.t); break; } }
   const a=A.k, c=B.k, lr=(i)=>a[i]+(c[i]-a[i])*f;
-  r.g.position.set(lr(0),lr(1),lr(2)); r.g.visible=(f<0.5?a[3]:c[3])>0.5 && (r.lv||'back')===LEVEL;
+  // late update: keep them moving along their last velocity for up to 0.3 s instead of freezing, then hold
+  let tx=lr(0), ty=lr(1), tz=lr(2); if(ext>0 && A.v){ tx+=A.v[0]*ext; tz+=A.v[2]*ext; ty+=A.v[1]*ext; const g=groundH(tx,tz)+0.6; if(ty<g) ty=g; }
+  const dtS=Math.min(0.1,(now-(r.lastDraw||now))/1000); r.lastDraw=now;
+  if(!r.sp) r.sp=new THREE.Vector3(tx,ty,tz); else { const k=1-Math.exp(-22*dtS); r.sp.x+=(tx-r.sp.x)*k; r.sp.y+=(ty-r.sp.y)*k; r.sp.z+=(tz-r.sp.z)*k; if(r.sp.distanceToSquared(tagV.set(tx,ty,tz))>16) r.sp.set(tx,ty,tz); }
+  r.g.position.copy(r.sp); r.g.visible=(f<0.5?a[3]:c[3])>0.5 && (r.lv||'back')===LEVEL;
   for(let n=0;n<r.nodes.length;n++){ const o=4+n*7, nd=r.nodes[n];
     nd.position.set(lr(o),lr(o+1),lr(o+2));
     qa.set(a[o+3],a[o+4],a[o+5],a[o+6]); qb.set(c[o+3],c[o+4],c[o+5],c[o+6]); nd.quaternion.copy(qa).slerp(qb,f).normalize(); }
@@ -4008,7 +4404,7 @@ function netTick(rdt,now){
   if(!NET.room) return;
   for(const r of NET.peers.values()) applyRemote(r,now);
   NET.sendT+=rdt;
-  if(NET.sendT>=0.08){ NET.sendT=0; NET.room.presence(Object.assign({k:packPose(),s:Math.round(stats.score),n:myName(),st:state==='title'?0:1,o:OUTFIT.i,b:BOARD?1:0,lv:LEVEL,jt:NET.jt||0,adm:ADM_BADGE&&NET.room&&ADM_BADGE.id===NET.room.info().id?ADM_BADGE.sig:undefined},netExtra())).catch(()=>{}); }
+  if(NET.sendT>=0.066){ NET.sendT=0; NET.room.presence(Object.assign({k:packPose(),s:Math.round(stats.score),n:myName(),st:state==='title'?0:1,o:OUTFIT.i,b:BOARD?1:0,lv:LEVEL,jt:NET.jt||0,adm:ADM_BADGE&&NET.room&&ADM_BADGE.id===NET.room.info().id?ADM_BADGE.sig:undefined},netExtra())).catch(()=>{}); }
   NET.listT+=rdt; if(NET.listT>0.5){ NET.listT=0; renderNetList(); }
 }
 
@@ -4365,7 +4761,7 @@ function applyArt(root){
   const bd=A('board'); if(bd){ use(R.board,bd); R.board.position.y=0; }
   for(const k of ['jacket','accent','pants','glove','gaiter','pack']){ const m=M[k]; if(!m) continue; m.map=null; m.normalMap=null; m.roughness=0.93; m.needsUpdate=true; }
   M.helmet.roughness=0.7; M.helmet.needsUpdate=true;
-  rideVis(R.rider,BOARD); fpList=null; setFPVis(CAM.fp && state!=='title'); indexPose(); placeSticker();
+  rideVis(R.rider,BOARD); fpList=null; setFPVis(CAM.fp && state!=='title'); indexPose(); placeSticker(); if(SHOP_READY) applyAcc();
   // trees and rocks
   const tF=A('treeFol'), tS=A('treeSnow'), tT=A('treeTrunk');
   if(tF&&tS&&tT){ foliage.geometry=tF.geo; caps.geometry=tS.geo; trunks.geometry=tT.geo; ART.tree=true; if(!farTrees) try{ buildFarTrees(tF.geo); }catch(e){ console.warn(e); }
