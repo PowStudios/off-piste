@@ -2740,7 +2740,7 @@ function setFP(on){ CAM.fp=on; try{ localStorage.setItem('off-piste-fp',on?'1':'
 const fpBoardYaw=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI/2);
 const fpQ=new THREE.Quaternion(), fpPitch=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-0.3), fpEye=new THREE.Vector3();
 let camOff=-1, camSlope=0; const camFocus=new THREE.Vector3();
-let camOcc=0;
+let camOcc=0, camLow=0;
 function updateCamera(dt,now){
   // on the menu, frame the rider in the open space to the right of the menu panel
   { const w=window.innerWidth, h=window.innerHeight, want=(state==='title' && w>700) ? Math.round(Math.min(400,w)/2)+(w|0)*1e4+(h|0)*1e9 : 0;
@@ -2780,7 +2780,7 @@ function updateCamera(dt,now){
   if(CAM.held>0 && !CAM.drag) CAM.held-=dt;
   if(!CAM.drag && CAM.held<=0 && sp>2 && P.crash<=0){
     const dy=wrap(behindYaw()-CAM.yaw); CAM.yaw+=dy*Math.min(1,(P.air?1.2:2.6)*dt); }
-  CAM.dist+=(CAM.zoom-CAM.dist)*Math.min(1,12*dt);
+  { const sf=state==='play' && !reduceMotion ? clamp((sp-8)/26,0,1) : 0; CAM.dist+=(CAM.zoom*(1-0.18*sf)-CAM.dist)*Math.min(1,(sf>0?3:12)*dt); camLow+=(sf*0.07-camLow)*Math.min(1,3*dt); }
   const fy=P.y+0.62+1.05-P.squash*0.15;                          // focus: about the rider's neck
   // follow with a little lag, but never let the lag grow past ~1.5 m (scaled down smoothly, never snapped)
   { let ex=camFocus.x-P.x, ey=camFocus.y-fy, ez=camFocus.z-P.z; const kx=Math.exp(-25*dt), ky=Math.exp(-(P.air?10:18)*dt); ex*=kx; ez*=kx; ey*=ky;
@@ -2788,7 +2788,7 @@ function updateCamera(dt,now){
   // pitch is measured from the slope, not the horizon: on a steep pitch the camera rides up with the hill behind you
   const hx=Math.sin(CAM.yaw), hz=Math.cos(CAM.yaw), g0=physH(P.x,P.z), up=(physH(P.x+hx*3,P.z+hz*3)-g0)/3;
   camSlope+=(Math.atan(up)-camSlope)*Math.min(1,4*dt);
-  const pe=clamp(CAM.pitch+camSlope*(LEVEL==='steep'||LEVEL==='everest'?0.32:0.75),-0.4,1.45), cp=Math.cos(pe), ox=hx*cp, oy=Math.sin(pe), oz=hz*cp;
+  const pe=clamp(CAM.pitch-camLow+camSlope*(LEVEL==='everest'?0.6:LEVEL==='steep'?0.32:0.75),-0.4,1.45), cp=Math.cos(pe), ox=hx*cp, oy=Math.sin(pe), oz=hz*cp;
   // pull in if the slope or a ramp is between the camera and the rider, so it never looks through the snow
   // (found exactly, then eased: pull in fast, ease back out slowly, so it doesn't step or flicker on steep faces)
   let dT=CAM.dist; const blk=t=>{ const x=camFocus.x+ox*t, y=camFocus.y+oy*t, z=camFocus.z+oz*t; return y<physH(x,z)+0.45; };
@@ -2800,11 +2800,11 @@ function updateCamera(dt,now){
   camLook.copy(camFocus); camLook.y+=0.22;          // aim a little over the rider's head so you see down the hill
   camera.lookAt(camLook);
   if(shake>0){ const s=shake*shake*0.25; camera.position.x+=rand(-s,s); camera.position.y+=rand(-s,s); shake=Math.max(0,shake-dt*2.2); }
-  { const kmh=Math.hypot(P.vx,P.vz)*3.6, sk=(state==='play' && !P.air && !reduceMotion) ? clamp((kmh-40)/65,0,1) : 0;
-    if(sk>0){ const a=sk*sk*0.013; camera.position.x+=(Math.sin(now*0.061)+Math.sin(now*0.137)*0.6)*a; camera.position.y+=(Math.sin(now*0.079)+Math.sin(now*0.163)*0.6)*a; } }
+  { const kmh=Math.hypot(P.vx,P.vz)*3.6, sk=(state==='play' && !P.air && !reduceMotion) ? clamp((kmh-25)/90,0,1) : 0;
+    if(sk>0){ const a=sk*0.028; camera.position.x+=(Math.sin(now*0.061)+Math.sin(now*0.137)*0.6)*a; camera.position.y+=(Math.sin(now*0.079)+Math.sin(now*0.163)*0.6)*a; } }
   const pk=P.pushT>0 ? Math.sin(Math.PI*clamp((1-P.pushT/PUSH_T-0.22)/0.5,0,1))*4 : 0;
-  const spf=state==='play' ? clamp((Math.hypot(P.vx,P.vz)-11)/16,0,1) : 0;
-  const fov=70+FOVX+pk+spf*spf*8;
+  const spf=state==='play' && !reduceMotion ? clamp((Math.hypot(P.vx,P.vz)-6)/28,0,1) : 0;
+  const fov=70+FOVX+pk+spf*(0.6+0.4*spf)*20;
   if(Math.abs(camera.fov-fov)>0.05){ camera.fov+=(fov-camera.fov)*Math.min(1,4*dt); camera.updateProjectionMatrix(); }
 }
 const STRK=(()=>{ const N=36, pos=new Float32Array(N*6), seed=[];
@@ -2815,8 +2815,11 @@ const STRK=(()=>{ const N=36, pos=new Float32Array(N*6), seed=[];
   return {N,pos,seed,g,m,ln}; })();
 function updateStreaks(dt){
   const sp=Math.hypot(P.vx,P.vz), on=state==='play' && !reduceMotion && GFX.level!=='low' && !CAM.fp;
-  const a=on ? clamp((sp-17)/20,0,1)*0.22 : 0;
+  const a=on ? clamp((sp-10)/22,0,1)*0.34 : 0;
   STRK.m.opacity+=(a-STRK.m.opacity)*Math.min(1,5*dt);
+  if(on && sp>4){ const n=sp*dt*(GFX.level==='low'?2:5), ux=P.vx/sp, uz=P.vz/sp;
+    for(let i=0;i<Math.floor(n)+(Math.random()<n%1?1:0);i++){ const f=rand(3,26), l=rand(-7,7), x=P.x+ux*f-uz*l, z=P.z+uz*f+ux*l;
+      emit(x,groundH(x,z)+rand(0.04,0.9),z,rand(-0.3,0.3),rand(-0.1,0.15),rand(-0.3,0.3),rand(0.035,0.08),rand(0.9,1.6),[0.95,0.97,1]); } }
   STRK.ln.visible=STRK.m.opacity>0.01; if(!STRK.ln.visible) return;
   STRK.ln.position.copy(camera.position); STRK.ln.quaternion.copy(camera.quaternion);
   const v=sp*1.6, len=0.25+sp*0.045, P2=STRK.pos;
