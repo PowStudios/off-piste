@@ -477,6 +477,17 @@ body.touch .speedo b{font-size:32px}
 .shopCoins b{font:900 22px/1 var(--display)}
 .coin{display:inline-block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 18%,#e6c25a 19% 55%,#9b7417 56%);box-shadow:inset 0 0 0 2px #6e5110;flex:none}
 .shopCoins .coin{width:20px;height:20px}
+.payGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.payTile{position:relative;display:grid;justify-items:start;gap:6px;padding:16px 14px 14px;background:#0b0b0b;border:1px solid rgba(255,255,255,.22);border-radius:4px;color:#fff;cursor:pointer;text-align:left;font:inherit}
+.payTile:hover,.payTile:focus-visible{border-color:#fff;outline:none}
+.payTile .coin{width:22px;height:22px}
+.payTile b{font:900 26px/1 var(--display)}
+.payTile span{font:800 15px/1 var(--display);padding:6px 10px;background:#fff;color:#0b0b0b}
+.payTile em{position:absolute;top:10px;right:10px;font:700 11px/1 var(--display);font-style:normal;letter-spacing:.08em;text-transform:uppercase;color:#bbb}
+.payTile.busy{opacity:.5;cursor:progress}
+@media (max-width:640px){ .payGrid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+#payNote{position:fixed;left:50%;top:calc(18px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:60;max-width:min(520px,90vw);padding:12px 18px;background:#0b0b0b;color:#fff;border-left:3px solid #fff;font:700 15px/1.3 var(--display)}
+#payNote.bad{border-left-color:#ff4d4d}
 .shopBody{flex:1;overflow-y:auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:26px;align-content:start}
 .shopSec h2{margin:0 0 10px;font:900 22px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;font-style:italic;color:#fff;display:flex;align-items:baseline;gap:12px}
 .shopSec h2 small{font:700 12px/1 var(--display);letter-spacing:.14em;color:#8a8a8a;font-style:normal}
@@ -588,6 +599,20 @@ body.touch #tut{bottom:auto;top:calc(70px + env(safe-area-inset-top,0px))}
 .menu::before{background:linear-gradient(100deg,rgba(4,4,4,.97) 0%,rgba(10,10,10,.93) 62%,rgba(22,22,22,.84) 100%)}
 .sheet{background:linear-gradient(100deg,rgba(4,4,4,.985) 0%,rgba(10,10,10,.97) 62%,rgba(22,22,22,.93) 100%)}
 .mi,.mi:first-child{background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.01));box-shadow:inset 3px 0 0 rgba(255,255,255,.4)}
+/* main menu: every option has its own colour (label and the bar on its left) */
+.mlist .mi:nth-child(1){--mc:#ff5a5a}
+.mlist .mi:nth-child(2){--mc:#ffa23a}
+.mlist .mi:nth-child(3){--mc:#ffd84a}
+.mlist .mi:nth-child(4){--mc:#7be36a}
+.mlist .mi:nth-child(5){--mc:#3fd6c8}
+.mlist .mi:nth-child(6){--mc:#4aa8ff}
+.mlist .mi:nth-child(7){--mc:#9b7bff}
+.mlist .mi:nth-child(8){--mc:#ff6fd1}
+.mlist .mi:nth-child(9){--mc:#c8f04a}
+.mlist .mi span{color:var(--mc,#fff)}
+.mlist .mi{box-shadow:inset 3px 0 0 var(--mc,rgba(255,255,255,.4))}
+.mlist .mi::before{background:var(--mc,#fff)}
+.mlist .mi:hover span,.mlist .mi:focus-visible span{color:var(--onacc)}
 .mark span{-webkit-text-fill-color:#fff;background:none}
 .bigscore{-webkit-text-fill-color:#fff;background:none}
 #fade{background:#000}
@@ -4036,7 +4061,34 @@ function shopTile(it,big){ const b=document.createElement('button'), own=gearOk(
   if(own){ const bd=document.createElement('span'); bd.className='sBadge'; bd.textContent='✓ Owned'; b.appendChild(bd); }
   else if(SHOP_EXTRA.includes(it)){ const nw=document.createElement('span'); nw.className='sNew'; nw.textContent='New'; b.appendChild(nw); }
   b.addEventListener('click',()=>shopDetail(it)); return b; }
-function renderShop(){ const box=$('shopBody'); if(!box) return; box.textContent=''; SHOP.q.length=0; coinSync(); SHOP.day=shopDay();
+/* ---------- Buying coins with real money (Stripe Checkout through a small Cloudflare Worker that checks each payment) ---------- */
+const PAY_URL='';   // the Worker's address, e.g. https://off-piste-pay.NAME.workers.dev  (empty: the packs row stays hidden)
+const COIN_PACKS=[{id:'p1',coins:1000,price:'$0.99'},{id:'p2',coins:2800,price:'$2.49',tag:'+12%'},{id:'p3',coins:6000,price:'$4.99',tag:'+20%'},{id:'p4',coins:13500,price:'$9.99',tag:'Best value'}];
+function payNote(t,bad){ let el=$('payNote'); if(!el){ el=document.createElement('div'); el.id='payNote'; el.setAttribute('role','status'); document.body.appendChild(el); }
+  el.textContent=t; el.className=bad?'bad':''; el.hidden=false; clearTimeout(payNote.t); payNote.t=setTimeout(()=>{ el.hidden=true; },6000); }
+async function payBuy(pack,btn){ if(!PAY_URL) return; btn.disabled=true; btn.classList.add('busy');
+  try{ const r=await fetch(PAY_URL+'/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pack,back:location.origin+location.pathname})});
+    const j=await r.json(); if(!r.ok||!j.url) throw new Error(j.error||'checkout failed'); location.href=j.url; }
+  catch(e){ btn.disabled=false; btn.classList.remove('busy'); payNote('Couldn\'t open checkout. Try again in a sec.',true); } }
+async function payClaim(){ let id=null; try{ const q=new URLSearchParams(location.search); id=q.get('paid');
+    if(id){ localStorage.setItem('op-claim',id); q.delete('paid'); history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash); }
+    else id=localStorage.getItem('op-claim'); }catch(e){}
+  if(!id || !PAY_URL) return;
+  try{ const r=await fetch(PAY_URL+'/claim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_id:id})}); const j=await r.json();
+    if(r.ok && j.coins>0){ STORE.coins+=j.coins; coinSave(); coinSync(); try{ localStorage.removeItem('op-claim'); }catch(e){} payNote('+'+fmt(j.coins)+' coins added. Thanks for supporting Off Piste!'); if(!$('shop').hidden) renderShop(); }
+    else if(r.status===409||r.status===400){ try{ localStorage.removeItem('op-claim'); }catch(e){} if(r.status===409) payNote('Those coins were already added.'); }
+    else if(r.status===402) payNote('Payment didn\'t go through, so no coins were added.',true); }
+  catch(e){ payNote('Couldn\'t reach the coin shop. Your coins will be added next time you open the game.',true); } }
+function payRow(box){ if(!PAY_URL) return; const s=document.createElement('section'); s.className='shopSec';
+  const h=document.createElement('h2'); h.textContent='Get coins'; const sm=document.createElement('small'); sm.textContent='Coins save on this device'; h.appendChild(sm);
+  const g=document.createElement('div'); g.className='payGrid';
+  for(const p of COIN_PACKS){ const b=document.createElement('button'); b.className='payTile'; b.type='button';
+    const c=document.createElement('i'); c.className='coin'; c.setAttribute('aria-hidden','true');
+    const n=document.createElement('b'); n.textContent=fmt(p.coins); const pr=document.createElement('span'); pr.textContent=p.price;
+    b.append(c,n,pr); if(p.tag){ const t=document.createElement('em'); t.textContent=p.tag; b.appendChild(t); }
+    b.setAttribute('aria-label','Buy '+fmt(p.coins)+' coins for '+p.price); b.onclick=()=>payBuy(p.id,b); g.appendChild(b); }
+  s.append(h,g); box.appendChild(s); }
+function renderShop(){ const box=$('shopBody'); if(!box) return; box.textContent=''; SHOP.q.length=0; coinSync(); SHOP.day=shopDay(); payRow(box);
   const sec=(title,sub,items,cls,big)=>{ if(!items.length) return; const s=document.createElement('section'); s.className='shopSec'; const h=document.createElement('h2'); h.textContent=title;
     if(sub){ const sm=document.createElement('small'); sm.textContent=sub; h.appendChild(sm); } const g=document.createElement('div'); g.className='shopGrid'+(cls?' '+cls:'');
     items.forEach(it=>g.appendChild(shopTile(it,big))); s.append(h,g); box.appendChild(s); };
@@ -4067,6 +4119,7 @@ $('smBuy').addEventListener('click',()=>{ const it=SHOP.sel; if(!it) return;
 $('smClose').addEventListener('click',shopClose);
 $('shopModal').addEventListener('click',e=>{ if(e.target===e.currentTarget) shopClose(); });
 function pvReset(){ if(PV.g){ PV.scene.remove(PV.g); for(const k in PV.mats) PV.mats[k].dispose(); PV.g=null; } if(PV.cache) PV.cache.clear(); }
+setTimeout(()=>{ payClaim(); try{ if(new URLSearchParams(location.search).get('shop')==='1'){ history.replaceState(null,'',location.pathname); shopOpen(); } }catch(e){} },400);
 function shopOpen(){ closeSheet(true); pvReset(); show('shop'); renderShop(); $('shopBody').scrollTop=0; clearInterval(SHOP.timer); SHOP.timer=setInterval(shopClock,1000); $('shopBack').focus(); }
 function shopExit(){ shopClose(); clearInterval(SHOP.timer); show('title'); const b=$('shopBtn'); if(b) b.focus(); }
 $('shopBtn').addEventListener('click',shopOpen);
