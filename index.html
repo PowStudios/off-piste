@@ -4060,7 +4060,7 @@ function shopTile(it,big){ const b=document.createElement('button'), own=gearOk(
   else if(SHOP_EXTRA.includes(it)){ const nw=document.createElement('span'); nw.className='sNew'; nw.textContent='New'; b.appendChild(nw); }
   b.addEventListener('click',()=>shopDetail(it)); return b; }
 /* ---------- Buying coins with real money (Stripe Checkout through a small Cloudflare Worker that checks each payment) ---------- */
-const PAY_URL='';   // the Worker's address, e.g. https://off-piste-pay.NAME.workers.dev  (empty: the packs row stays hidden)
+const PAY_URL='https://off-piste-pay.rhlol.workers.dev';   // the Worker's address, e.g. https://off-piste-pay.NAME.workers.dev  (empty: the packs row stays hidden)
 const COIN_PACKS=[{id:'p1',coins:1000,price:'$0.99'},{id:'p2',coins:2800,price:'$2.49',tag:'+12%'},{id:'p3',coins:6000,price:'$4.99',tag:'+20%'},{id:'p4',coins:13500,price:'$9.99',tag:'Best value'}];
 function payNote(t,bad){ let el=$('payNote'); if(!el){ el=document.createElement('div'); el.id='payNote'; el.setAttribute('role','status'); document.body.appendChild(el); }
   el.textContent=t; el.className=bad?'bad':''; el.hidden=false; clearTimeout(payNote.t); payNote.t=setTimeout(()=>{ el.hidden=true; },6000); }
