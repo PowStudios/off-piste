@@ -490,22 +490,22 @@ body.touch .speedo b{font-size:32px}
 .shopBody{flex:1;overflow-y:auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:26px;align-content:start}
 .shopSec h2{margin:0 0 10px;font:900 22px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;font-style:italic;color:#fff;display:flex;align-items:baseline;gap:12px}
 .shopSec h2 small{font:700 12px/1 var(--display);letter-spacing:.14em;color:#8a8a8a;font-style:normal}
-.shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
+.shopGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 .shopGrid.feat{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
 .stile{position:relative;display:flex;flex-direction:column;justify-content:flex-end;aspect-ratio:4/5;padding:0;border:0;border-radius:4px;overflow:hidden;cursor:pointer;color:#fff;text-align:left;
   background:var(--rb);box-shadow:inset 0 0 0 2px var(--re);transition:transform .14s ease,box-shadow .14s ease}
 .stile.big{aspect-ratio:auto;min-height:340px}
 .stile:hover,.stile:focus-visible{transform:translateY(-3px);box-shadow:inset 0 0 0 3px #fff;outline:none}
 .stile::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 14px);pointer-events:none}
-.sArt{position:absolute;inset:0 0 54px 0;display:flex;align-items:center;justify-content:center}
+.sArt{position:absolute;inset:0 0 70px 0;display:flex;align-items:center;justify-content:center}
 .sArt img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
 .stile.big .sArt{inset:0 0 64px 0}
-.sMeta{position:relative;display:grid;gap:3px;padding:8px 10px 9px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.78) 30%)}
-.sMeta b{font:900 18px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.sMeta{position:relative;display:grid;gap:5px;padding:12px 14px 14px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.78) 30%)}
+.sMeta b{font:900 24px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .stile.big .sMeta b{font-size:28px}
-.sMeta small{font:700 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
-.sPrice{display:flex;align-items:center;gap:6px;font:900 16px/1 var(--display)}
-.sPrice .coin{width:15px;height:15px}
+.sMeta small{font:700 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.sPrice{display:flex;align-items:center;gap:7px;font:900 20px/1 var(--display)}
+.sPrice .coin{width:19px;height:19px}
 .stile.own .sPrice{color:#fff;letter-spacing:.12em;font-size:13px}
 .sBadge{position:absolute;top:8px;right:8px;padding:4px 7px;background:#fff;color:#050505;font:900 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase}
 .sNew{position:absolute;top:8px;left:8px;padding:4px 7px;background:#ffe14d;color:#050505;font:900 11px/1 var(--display);letter-spacing:.12em;text-transform:uppercase}
@@ -529,7 +529,7 @@ body.touch .speedo b{font-size:32px}
 .smBuy.eq{background:none;color:#fff;box-shadow:inset 0 0 0 2px #fff}
 @keyframes smPop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
 .smCard.bought .smArt{animation:smPop .45s ease}
-@media (max-width:640px){ .smCard{grid-template-columns:1fr} .smArt{height:min(300px,45vh)} .smInfo h2{font-size:32px} .shopGrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))} .stile.big{min-height:260px} .shopTop{grid-template-columns:auto 1fr;}
+@media (max-width:640px){ .smCard{grid-template-columns:1fr} .smArt{height:min(300px,45vh)} .smInfo h2{font-size:32px} .shopGrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))} .sMeta b{font-size:18px} .sPrice{font-size:16px} .sArt{inset:0 0 56px 0} .stile.big{min-height:260px} .shopTop{grid-template-columns:auto 1fr;}
   .shopCoins{grid-column:2;justify-self:end;grid-row:1} .shopTitle{grid-column:1/-1;grid-row:2} }
 @media (prefers-reduced-motion:reduce){ .stile{transition:none} .smCard.bought .smArt{animation:none} }
 .tagDemo{position:static!important;transform:none!important;font-size:16px!important;padding:6px 14px 7px!important}
